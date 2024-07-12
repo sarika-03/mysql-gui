@@ -1,0 +1,23 @@
+{
+  "name": "mysql-gui",
+  "version": "1.0.0",
+  "description": "A GUI application for mysql, which helps developers in faster development",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kshashikumar/mysql-gui.git"
+  },
+  "author": "shashi kumar kasturi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kshashikumar/mysql-gui/issues"
+  },
+  "homepage": "https://github.com/kshashikumar/mysql-gui#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
