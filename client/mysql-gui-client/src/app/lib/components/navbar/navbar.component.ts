@@ -1,0 +1,46 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { LogoComponent } from '../logo/logo.component';
+
+import { AppTheme, ThemeService } from '@lib/services/theme';
+import { Subject, takeUntil } from 'rxjs';
+
+@Component({
+    selector: 'app-navbar',
+    standalone: true,
+    imports: [CommonModule, RouterModule, LogoComponent],
+    templateUrl: './navbar.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class NavbarComponent implements OnInit, OnDestroy {
+    private readonly _router = inject(Router);
+    private readonly _destroy$ = new Subject();
+    currentTheme!: AppTheme | null;
+
+    private readonly _themeService = inject(ThemeService);
+
+    ngOnInit(): void {
+        // Subscribe to the theme service to get the initial theme value
+        this._themeService.currentTheme$.pipe(takeUntil(this._destroy$)).subscribe((theme) => {
+            // Ensure the currentTheme is set correctly
+            this.currentTheme = theme;
+        });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.complete();
+        this._destroy$.unsubscribe();
+    }
+
+    toggleTheme(): void {
+        // Toggle between light and dark based on the current theme
+        const newTheme: AppTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        this.handleThemeChange(newTheme);
+    }
+
+    handleThemeChange(theme: AppTheme): void {
+        // Set the theme in the service, which will automatically update the current theme
+        this._themeService.setTheme(theme);
+    }
+}
