@@ -5,6 +5,7 @@
   "scripts": {
     "ng": "ng",
     "dev": "ng serve",
+    "start": "npm-run-all --parallel serve tailwind",
     "dev:host": "ng serve --host 0.0.0.0 --disable-host-check",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
@@ -26,6 +27,7 @@
     "@angular/platform-browser": "^16.0.0",
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
+    "npm-run-all": "^4.1.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
@@ -49,7 +51,7 @@
     "@types/node": "^20.1.3",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
-    "autoprefixer": "^10.4.14",
+    "autoprefixer": "^10.4.20",
     "cypress": "^13.1.0",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
@@ -60,13 +62,13 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "postcss": "^8.4.23",
+    "postcss": "^8.4.47",
     "prettier": "^2.8.8",
     "prettier-eslint": "^15.0.1",
     "prettier-plugin-tailwindcss": "^0.2.8",
     "simple-git-hooks": "^2.8.1",
     "stylelint": "^15.6.1",
-    "tailwindcss": "^3.3.2",
+    "tailwindcss": "^3.4.13",
     "typescript": "~5.0.2"
   }
 }

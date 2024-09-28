@@ -1,5 +1,13 @@
-<app-navbar></app-navbar>
-
-<main class="container py-6">
-    <ng-content></ng-content>
-</main>
+<div class="flex h-screen flex-col">
+    <app-navbar></app-navbar>
+    <div class="flex flex-grow rounded-md bg-gray-300 dark:bg-gray-800">
+        <div class="m-1 w-64 bg-gray-100 dark:bg-gray-900">
+            <app-sidebar></app-sidebar>
+        </div>
+        <div class="m-1 flex-grow overflow-hidden rounded-md bg-gray-100 dark:bg-gray-900">
+            <main class="h-full bg-gray-100 dark:bg-gray-900">
+                <ng-content></ng-content>
+            </main>
+        </div>
+    </div>
+</div>
