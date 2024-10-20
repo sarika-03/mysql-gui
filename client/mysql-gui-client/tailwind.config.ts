@@ -8,6 +8,7 @@ const TAILWIND_PLUGINS = [
     require('postcss-import'),
     require('tailwindcss'),
     require('autoprefixer'),
+    require('tailwind-scrollbar'),
 ];
 
 const CUSTOM_PLUGINS = [addDynamicIconSelectors()];

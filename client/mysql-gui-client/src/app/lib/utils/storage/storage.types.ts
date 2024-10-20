@@ -14,3 +14,8 @@ export type StorageObjectData<T extends StorageObjectType> = {
     type: T;
     data: StorageObjectMap[T];
 };
+
+export interface newTabData {
+    dbName: string;
+    tableName: string;
+}

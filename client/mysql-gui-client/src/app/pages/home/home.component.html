@@ -1,147 +1,37 @@
-<div class="bg-gray-400">
-    <div class="ml-2 text-sm">Navigator</div>
-    <div class="bg-gray-100 p-2 dark:bg-gray-900">
+<div class="flex h-[calc(100vh-65px)] flex-col">
+    <!-- Top fixed content -->
+    <div class="bg-gray-400 p-2 text-sm">Tabs</div>
+    <div class="bg-gray-200 p-2 text-lg dark:bg-gray-800">Tools</div>
+
+    <!-- Flex-grow content that divides remaining space -->
+    <div class="flex-1 overflow-auto bg-gray-100 p-2 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between text-sm font-semibold">
-            <span>SCHEMAS</span>
-            <span
-                class="text-md ml-2 mr-2"
-                [ngClass]="'icon-[fa--refresh]'"
-            ></span>
-        </div>
-
-        <div>
-            <span
-                class="text-md mr-2"
-                [ngClass]="'icon-[fa--search]'"
-            ></span>
-            <input
-                class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
-                type="text"
-                placeholder="Filter objects"
-            />
-
-            <div class="mb-2">
-                <div
-                    class="flex cursor-pointer items-center"
-                    (click)="toggleSection('swrinnov_clinicehr')"
-                >
-                    <span class="mr-1">
-                        <ng-container *ngIf="isOpen('swrinnov_clinicehr'); else closed">
-                            <span
-                                class="text-md mr-2"
-                                [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
-                            ></span>
-                        </ng-container>
-                        <ng-template #closed>
-                            <span
-                                class="text-md mr-2"
-                                [ngClass]="'icon-[pepicons-pencil--triangle-right-filled]'"
-                            ></span>
-                        </ng-template>
-                    </span>
-                    <span>swrinnov_clinicehr</span>
+            <div class="flex flex-col items-center">
+                <!-- Tabs navigation -->
+                <div class="mb-4 flex space-x-2 border-b-2 border-gray-200">
+                    <button
+                        *ngFor="let tab of tabs"
+                        class="border-b-4 border-transparent px-4 py-2 text-sm font-medium text-gray-600 hover:border-blue-600 hover:text-blue-600"
+                        [ngClass]="{ 'border-blue-600 text-blue-600': selectedTab === tab }"
+                        (click)="selectTab(tab)"
+                    ></button>
                 </div>
 
-                <div
-                    *ngIf="isOpen('swrinnov_clinicehr')"
-                    class="ml-4"
-                >
+                <!-- Tab content -->
+                <div class="w-full">
                     <div
-                        class="flex cursor-pointer items-center"
-                        (click)="toggleSection('tables')"
+                        *ngIf="selectedTab === 1"
+                        class="p-4"
                     >
-                        <span class="mr-1">
-                            <ng-container *ngIf="isOpen('tables'); else closedTable">
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
-                                ></span>
-                            </ng-container>
-                            <ng-template #closedTable>
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pencil--triangle-right-filled]'"
-                                ></span>
-                            </ng-template>
-                        </span>
-                        <span>Tables</span>
-                    </div>
-                    <ul
-                        *ngIf="isOpen('tables')"
-                        class="ml-4 list-none"
-                    >
-                        <li
-                            *ngFor="let table of tables"
-                            class="mb-1"
-                        >
-                            {{ table }}
-                        </li>
-                    </ul>
-
-                    <div
-                        class="flex cursor-pointer items-center"
-                        (click)="toggleSection('views')"
-                    >
-                        <span class="mr-1">
-                            <ng-container *ngIf="isOpen('views'); else closedView">
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
-                                ></span>
-                            </ng-container>
-                            <ng-template #closedView>
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pencil--triangle-right-filled]'"
-                                ></span>
-                            </ng-template>
-                        </span>
-                        <span>Views</span>
-                    </div>
-
-                    <div
-                        class="flex cursor-pointer items-center"
-                        (click)="toggleSection('procedures')"
-                    >
-                        <span class="mr-1">
-                            <ng-container *ngIf="isOpen('procedures'); else closedProcedure">
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
-                                ></span>
-                            </ng-container>
-                            <ng-template #closedProcedure>
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pencil--triangle-right-filled]'"
-                                ></span>
-                            </ng-template>
-                        </span>
-                        <span>Stored Procedures</span>
-                    </div>
-
-                    <div
-                        class="flex cursor-pointer items-center"
-                        (click)="toggleSection('functions')"
-                    >
-                        <span class="mr-1">
-                            <ng-container *ngIf="isOpen('functions'); else closedFunction">
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
-                                ></span>
-                            </ng-container>
-                            <ng-template #closedFunction>
-                                <span
-                                    class="text-md mr-2"
-                                    [ngClass]="'icon-[pepicons-pencil--triangle-right-filled]'"
-                                ></span>
-                            </ng-template>
-                        </span>
-                        <span>Functions</span>
+                        <p class="text-gray-700">Content for Tab 1</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="flex-1 overflow-auto bg-gray-100 p-2 dark:bg-gray-900">
+        <div class="mb-1 flex items-center justify-between text-sm font-semibold">
+            <div class="p-2 text-sm">Result Grid</div>
         </div>
     </div>
 </div>
