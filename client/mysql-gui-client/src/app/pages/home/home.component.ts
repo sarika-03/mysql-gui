@@ -16,6 +16,7 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/lib/codemirror.css';
 import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
+import { BackendService } from '@lib/services';
 
 @Component({
     selector: 'app-home',
@@ -31,6 +32,9 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     tabContent: string[] = [];
     editorInstance: any;
     needsEditorInit = false;
+    triggerQuery: string = '';
+    selectedDB: string = '';
+    currentTabId: string = '';
 
     constructor() {}
 
@@ -90,6 +94,7 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     addTab(dbName: string, tableName: string) {
         const id = `${dbName}.${tableName}`;
         const tabIndex = this.tabs.findIndex((tab) => tab.id === id);
+
         if (tabIndex > -1) {
             this.selectTab(tabIndex);
             return;
@@ -103,18 +108,26 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
 
         this.tabContent.push(`SELECT * FROM ${dbName}.${tableName};`);
         this.selectTab(this.tabs.length - 1);
+      
         if (!this.editorInstance) {
             this.needsEditorInit = true;
         } else {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
+            this.triggerQuery = this.tabContent[this.selectedTab];
+            this.selectedDB = dbName;
+            this.currentTabId = id;
         }
     }
 
     selectTab(tabIndex: number) {
-        this.selectedTab = tabIndex;
         if (!this.tabContent[tabIndex]) {
             this.tabContent[tabIndex] = '';
         }
+
+        this.selectedTab = tabIndex;
+        this.selectedDB = this.tabs[tabIndex].dbName;
+        this.triggerQuery = this.tabContent[tabIndex];
+        this.currentTabId = this.tabs[tabIndex].id;
 
         if (this.editorInstance) {
             this.editorInstance.setValue(this.tabContent[tabIndex]);
@@ -128,6 +141,9 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
 
         if (this.editorInstance && this.selectedTab >= 0) {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
+            this.triggerQuery = this.tabContent[this.selectedTab];
+            this.selectedDB = this.tabs[this.selectedTab]?.dbName || '';
+            this.currentTabId = this.tabs[this.selectedTab]?.id || '';
         } else {
             this.editorInstance?.toTextArea();
             this.editorInstance = null;
