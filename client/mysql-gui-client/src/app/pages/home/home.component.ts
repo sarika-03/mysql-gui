@@ -6,11 +6,12 @@ import { newTabData } from '@lib/utils/storage/storage.types';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/lib/codemirror.css';
+import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, ResultGridComponent],
     templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnChanges, AfterViewInit {
@@ -30,20 +31,40 @@ export class HomeComponent implements OnChanges, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        // Initialize CodeMirror on the textarea
         this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
             lineNumbers: true,
-            mode: 'sql', // Use SQL mode for syntax highlighting
+            mode: 'sql',
             theme: 'default',
-            lineWrapping: true, // Enable line wrapping for better readability
-            matchBrackets: true, // Highlight matching brackets
+            lineWrapping: true,
+            matchBrackets: true,
+            showCursorWhenSelecting: true,
+            smartIndent: true,
+            extraKeys: {
+                'Ctrl-Space': 'autocomplete',
+                'Ctrl-Q': function (cm) {
+                    cm.foldCode(cm.getCursor());
+                },
+            },
+            autofocus: true,
+            cursorHeight: 0.85,
+            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+            highlightSelectionMatches: {
+                showToken: /\w/,
+                annotateScrollbar: true,
+            },
+            hintOptions: {
+                completeSingle: false,
+            },
+            matchTags: { bothTags: true },
+        });
+        this.editorInstance.on('change', () => {
+            this.tabContent[this.selectedTab] = this.editorInstance.getValue();
         });
 
-        // Set initial content if available
         if (this.tabContent[this.selectedTab]) {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
         } else {
-            this.editorInstance.setValue(''); // Ensure there is always a valid string
+            this.editorInstance.setValue('');
         }
     }
 
@@ -61,11 +82,8 @@ export class HomeComponent implements OnChanges, AfterViewInit {
             tableName,
         });
 
-        // Add empty content for the new tab if it's not already initialized
         this.tabContent.push(`SELECT * FROM ${dbName}.${tableName};`);
         this.selectTab(this.tabs.length - 1);
-
-        // Update CodeMirror content when a new tab is added
         if (this.editorInstance) {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
         }
@@ -73,13 +91,10 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
     selectTab(tabIndex: number) {
         this.selectedTab = tabIndex;
-
-        // Ensure there's valid content for the selected tab
         if (!this.tabContent[tabIndex]) {
-            this.tabContent[tabIndex] = ''; // Initialize with an empty string if not set
+            this.tabContent[tabIndex] = '';
         }
 
-        // Update the editor content based on the selected tab
         if (this.editorInstance) {
             this.editorInstance.setValue(this.tabContent[tabIndex]);
         }
