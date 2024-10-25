@@ -43,7 +43,13 @@
 
     <div class="flex-1 overflow-auto bg-gray-100 p-2 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between text-sm font-semibold">
-            <div class="text-sm"><app-resultgrid></app-resultgrid></div>
+            <div class="text-sm">
+                <app-resultgrid
+                    [triggerQuery]="triggerQuery"
+                    [dbName]="selectedDB"
+                    [tabId]="currentTabId"
+                ></app-resultgrid>
+            </div>
         </div>
     </div>
 </div>
