@@ -1,0 +1,20 @@
+/* Customize CodeMirror appearance */
+.CodeMirror {
+    font-family: 'Courier New', Courier, monospace;
+    height: 100%;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .CodeMirror-gutters {
+    background-color: #f0f0f0;
+    border-right: 1px solid #ddd;
+  }
+  
+  /* Line number styling */
+  .CodeMirror-linenumber {
+    color: #888;
+  }
+  
