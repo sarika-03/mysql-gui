@@ -27,26 +27,23 @@
 
     <div class="bg-gray-200 p-2 text-sm dark:bg-gray-800">Tools</div>
 
-    <div class="flex flex-1 flex-col overflow-auto bg-gray-100 p-2 dark:bg-gray-900">
-        <div class="flex flex-1 items-center justify-between text-sm font-semibold">
-            <div class="flex h-full w-full flex-col">
-                <!-- Display the textarea with the content of the selected tab -->
-                <div
-                    *ngIf="selectedTab !== -1"
-                    class="flex-1 overflow-auto bg-white"
-                >
-                    <textarea
-                        #editor
-                        class="h-full w-full"
-                    ></textarea>
-                </div>
+    <div class="flex flex-1 flex-col overflow-auto bg-gray-100 dark:bg-gray-900">
+        <div class="flex flex-1 flex-col">
+            <div
+                *ngIf="selectedTab !== -1"
+                class="flex-1"
+            >
+                <textarea
+                    #editor
+                    class="h-full w-full resize-none rounded-md bg-white p-4"
+                ></textarea>
             </div>
         </div>
     </div>
 
     <div class="flex-1 overflow-auto bg-gray-100 p-2 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between text-sm font-semibold">
-            <div class="p-2 text-sm">Result Grid</div>
+            <div class="text-sm"><app-resultgrid></app-resultgrid></div>
         </div>
     </div>
 </div>
