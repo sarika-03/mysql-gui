@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    SimpleChanges,
+    ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -15,7 +24,7 @@ import { BackendService } from '@lib/services';
     imports: [CommonModule, RouterModule, FormsModule, ResultGridComponent],
     templateUrl: './home.component.html',
 })
-export class HomeComponent implements OnChanges, AfterViewInit {
+export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
     @ViewChild('editor', { static: false }) editor: ElementRef;
     tabs = [];
@@ -36,40 +45,49 @@ export class HomeComponent implements OnChanges, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
-            lineNumbers: true,
-            mode: 'sql',
-            theme: 'default',
-            lineWrapping: true,
-            matchBrackets: true,
-            showCursorWhenSelecting: true,
-            smartIndent: true,
-            extraKeys: {
-                'Ctrl-Space': 'autocomplete',
-                'Ctrl-Q': function (cm) {
-                    cm.foldCode(cm.getCursor());
-                },
-            },
-            autofocus: true,
-            cursorHeight: 0.85,
-            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-            highlightSelectionMatches: {
-                showToken: /\w/,
-                annotateScrollbar: true,
-            },
-            hintOptions: {
-                completeSingle: false,
-            },
-            matchTags: { bothTags: true },
-        });
-        this.editorInstance.on('change', () => {
-            this.tabContent[this.selectedTab] = this.editorInstance.getValue();
-        });
+        this.initializeEditor();
+    }
 
-        if (this.tabContent[this.selectedTab]) {
+    ngAfterViewChecked() {
+        if (this.needsEditorInit && !this.editorInstance && this.editor) {
+            this.initializeEditor();
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
-        } else {
-            this.editorInstance.setValue('');
+            this.needsEditorInit = false;
+        }
+    }
+
+    initializeEditor() {
+        if (!this.editorInstance) {
+            this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
+                lineNumbers: true,
+                mode: 'sql',
+                theme: 'default',
+                lineWrapping: true,
+                matchBrackets: true,
+                showCursorWhenSelecting: true,
+                smartIndent: true,
+                extraKeys: {
+                    'Ctrl-Space': 'autocomplete',
+                    'Ctrl-Q': function (cm) {
+                        cm.foldCode(cm.getCursor());
+                    },
+                },
+                autofocus: true,
+                cursorHeight: 0.85,
+                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+                highlightSelectionMatches: {
+                    showToken: /\w/,
+                    annotateScrollbar: true,
+                },
+                hintOptions: {
+                    completeSingle: false,
+                },
+                matchTags: { bothTags: true },
+            });
+
+            this.editorInstance.on('change', () => {
+                this.tabContent[this.selectedTab] = this.editorInstance.getValue();
+            });
         }
     }
 
@@ -90,7 +108,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
         this.tabContent.push(`SELECT * FROM ${dbName}.${tableName};`);
         this.selectTab(this.tabs.length - 1);
-
+      
         if (!this.editorInstance) {
             this.needsEditorInit = true;
         } else {
@@ -127,7 +145,9 @@ export class HomeComponent implements OnChanges, AfterViewInit {
             this.selectedDB = this.tabs[this.selectedTab]?.dbName || '';
             this.currentTabId = this.tabs[this.selectedTab]?.id || '';
         } else {
-            this.editorInstance.setValue('');
+            this.editorInstance?.toTextArea();
+            this.editorInstance = null;
+            this.needsEditorInit = true;
         }
     }
 }
