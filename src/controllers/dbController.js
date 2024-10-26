@@ -132,7 +132,22 @@ const getTables = async (req, res) => {
   }
 };
 
+const executeQuery = async (req, res) => {
+  const dbName = req.params.dbName;
+  const { query } = req.body;
+  try {
+    await DBConnector.ConnectToDb(dbName);
+    const queryInfo = await DBConnector.GetDB().raw(query);
+    console.log("queryInfo:", queryInfo[0]);
+    res.status(200).json(queryInfo[0]);
+  } catch (err) {
+    console.error("Error fetching queryInfo:", err);
+    res.status(500).json({ error: "Error fetching queryInfo" });
+  }
+};
+
 module.exports = {
   getDatabases,
   getTables,
+  executeQuery,
 };

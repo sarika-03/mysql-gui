@@ -14,4 +14,10 @@ export class BackendService {
     getDatabases(): Observable<any[]> {
         return this._http.get<any[]>(`${this.BASE_URL}/databases`);
     }
+
+    executeQuery(query: string, dbName: string): Observable<any[]> {
+        console.log('calledbackend');
+        const payload = { query };
+        return this._http.post<any[]>(`${this.BASE_URL}/database/${dbName}/execute-query`, payload);
+    }
 }
