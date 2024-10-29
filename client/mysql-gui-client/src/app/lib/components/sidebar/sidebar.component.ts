@@ -32,6 +32,9 @@ export class SideBarComponent implements OnInit {
     ngOnInit(): void {
         this.getDatabases();
     }
+    refresh() {
+        this.getDatabases();
+    }
 
     getDatabases() {
         this.isLoading = true;
