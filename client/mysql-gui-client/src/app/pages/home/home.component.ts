@@ -28,11 +28,12 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     @Input() tabData!: newTabData;
     @ViewChild('editor', { static: false }) editor: ElementRef;
     tabs = [];
-    selectedTab = 0;
+    selectedTab = -1;
     tabContent: string[] = [];
     editorInstance: any;
     needsEditorInit = false;
     triggerQuery: string = '';
+    executeTriggered: boolean = false;
     selectedDB: string = '';
     currentTabId: string = '';
 
@@ -45,14 +46,20 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     }
 
     ngAfterViewInit() {
-        this.initializeEditor();
+        this.checkAndInitializeEditor();
     }
 
     ngAfterViewChecked() {
-        if (this.needsEditorInit && !this.editorInstance && this.editor) {
-            this.initializeEditor();
+        if (this.needsEditorInit && this.selectedTab >= 0 && this.editor && !this.editorInstance) {
+            this.checkAndInitializeEditor();
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
             this.needsEditorInit = false;
+        }
+    }
+
+    checkAndInitializeEditor() {
+        if (!this.editorInstance && this.editor) {
+            this.initializeEditor();
         }
     }
 
@@ -108,7 +115,7 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
 
         this.tabContent.push(`SELECT * FROM ${dbName}.${tableName};`);
         this.selectTab(this.tabs.length - 1);
-      
+
         if (!this.editorInstance) {
             this.needsEditorInit = true;
         } else {
@@ -132,6 +139,7 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
         if (this.editorInstance) {
             this.editorInstance.setValue(this.tabContent[tabIndex]);
         }
+        this.executeTriggered = false;
     }
 
     closeTab(tabIndex: number) {
@@ -149,5 +157,19 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
             this.editorInstance = null;
             this.needsEditorInit = true;
         }
+    }
+
+    handleExecQueryClick() {
+        this.triggerQuery = this.tabContent[this.selectedTab];
+        this.executeTriggered = true;
+    }
+
+    onDiscQueryClick() {
+        if (this.editorInstance) {
+            this.editorInstance.setValue('');
+        }
+        this.tabContent[this.selectedTab] = '';
+        this.triggerQuery = '';
+        this.executeTriggered = false;
     }
 }
