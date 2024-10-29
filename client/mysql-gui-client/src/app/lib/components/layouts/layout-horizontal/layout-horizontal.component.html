@@ -1,7 +1,7 @@
-<div class="flex h-screen flex-col">
+<div class="flex h-screen flex-col overflow-hidden">
     <app-navbar></app-navbar>
-    <div class="flex flex-grow rounded-md bg-gray-300 dark:bg-gray-800">
-        <div class="m-1 w-64 bg-gray-100 dark:bg-gray-900">
+    <div class="flex flex-grow overflow-hidden rounded-md bg-gray-300 dark:bg-gray-800">
+        <div class="m-1 h-full w-64 bg-gray-100 dark:bg-gray-900">
             <app-sidebar (newTabEmitter)="handleNewTabData($event)"></app-sidebar>
         </div>
         <div class="m-1 flex-grow overflow-hidden bg-gray-100 dark:bg-gray-900">
