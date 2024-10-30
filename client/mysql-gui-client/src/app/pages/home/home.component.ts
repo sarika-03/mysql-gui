@@ -1,6 +1,8 @@
 import {
     AfterViewChecked,
     AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ElementRef,
     Input,
@@ -27,6 +29,7 @@ import { BackendService } from '@lib/services';
 export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
     @ViewChild('editor', { static: false }) editor: ElementRef;
+    @ViewChild('tabContainer', { static: false }) tabContainer: ElementRef;
     tabs = [];
     selectedTab = -1;
     tabContent: string[] = [];
@@ -37,7 +40,7 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     selectedDB: string = '';
     currentTabId: string = '';
 
-    constructor() {}
+    constructor(private cdr: ChangeDetectorRef) {}
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['tabData'] && this.tabData?.dbName && this.tabData?.tableName) {
@@ -124,6 +127,9 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
             this.selectedDB = dbName;
             this.currentTabId = id;
         }
+
+        this.cdr.detectChanges();
+        this.scrollTabIntoView(this.tabs.length - 1);
     }
 
     selectTab(tabIndex: number) {
@@ -140,6 +146,17 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
             this.editorInstance.setValue(this.tabContent[tabIndex]);
         }
         this.executeTriggered = false;
+        this.cdr.detectChanges();
+        this.scrollTabIntoView(tabIndex);
+    }
+
+    scrollTabIntoView(tabIndex: number) {
+        if (this.tabContainer && this.tabContainer.nativeElement) {
+            const tabElement = this.tabContainer.nativeElement.children[tabIndex];
+            if (tabElement) {
+                tabElement.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            }
+        }
     }
 
     closeTab(tabIndex: number) {
