@@ -16,12 +16,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: Publish to npm
         run: |
           git config user.name "kshashikumar"
-          git config user.email "shashipatel2712@gmail.com"
-          npm publish --registry=https://registry.npmjs.org/
+          git config user.email "skastu01@nyit.edu"
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
