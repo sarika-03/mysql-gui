@@ -1,6 +1,6 @@
 <div class="h-screen overflow-hidden bg-gray-400">
     <div class="ml-2 text-sm">Navigator</div>
-    <div class="h-[calc(100vh-3.5rem)] overflow-y-auto overflow-x-hidden bg-gray-100 dark:bg-gray-900">
+    <div class="h-[calc(100%-2rem)] bg-gray-100 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between p-2 text-sm font-semibold">
             <span>SCHEMAS</span>
             <span
@@ -9,22 +9,22 @@
                 (click)="refresh()"
             ></span>
         </div>
+        <div class="p-2">
+            <span
+                class="text-md mr-2"
+                [ngClass]="'icon-[fa--search]'"
+            ></span>
+            <input
+                class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
+                type="text"
+                placeholder="Filter objects"
+            />
+            <ng-template #loading>
+                <div>Loading...</div>
+            </ng-template>
+        </div>
 
-        <div>
-            <div class="p-2">
-                <span
-                    class="text-md mr-2"
-                    [ngClass]="'icon-[fa--search]'"
-                ></span>
-                <input
-                    class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
-                    type="text"
-                    placeholder="Filter objects"
-                />
-                <ng-template #loading>
-                    <div>Loading...</div>
-                </ng-template>
-            </div>
+        <div class="h-[80vh] overflow-auto">
             <div
                 class="pb-2 pl-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-500"
                 *ngIf="databases['databases']; else loading"
