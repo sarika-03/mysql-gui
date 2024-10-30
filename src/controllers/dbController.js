@@ -132,7 +132,45 @@ const getTables = async (req, res) => {
   }
 };
 
+const executeQuery = async (req, res) => {
+  const dbName = req.params.dbName;
+  let { query, page = 1, pageSize = 10 } = req.body;
+  try {
+    await DBConnector.ConnectToDb(dbName);
+
+    query = query.trim().replace(/;$/, "");
+    const hasLimitOrOffset =
+      /LIMIT\s+\d+/i.test(query) || /OFFSET\s+\d+/i.test(query);
+    let paginatedQuery;
+    if (!hasLimitOrOffset) {
+      const offset = (page - 1) * pageSize;
+      paginatedQuery = `${query} LIMIT ${pageSize} OFFSET ${offset}`;
+    } else {
+      paginatedQuery = query;
+    }
+
+    const queryInfo = await DBConnector.GetDB().raw(paginatedQuery);
+
+    const totalRowsQuery = `SELECT COUNT(*) as count FROM (${query}) as subquery`;
+    const totalRowsResult = await DBConnector.GetDB().raw(totalRowsQuery);
+    const totalRows = totalRowsResult[0][0].count;
+
+    res.status(200).json({ rows: queryInfo[0], totalRows });
+  } catch (err) {
+    console.error("Error fetching queryInfo:", err);
+
+    if (err.code === "ER_PARSE_ERROR" || err.sqlState === "42000") {
+      res
+        .status(400)
+        .json({ error: "SQL syntax error. Please check your query." });
+    } else {
+      res.status(500).json({ error: "Error fetching queryInfo" });
+    }
+  }
+};
+
 module.exports = {
   getDatabases,
   getTables,
+  executeQuery,
 };

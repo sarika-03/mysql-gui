@@ -1,31 +1,32 @@
-<div class="bg-gray-400">
+<div class="h-screen overflow-hidden bg-gray-400">
     <div class="ml-2 text-sm">Navigator</div>
-    <div class="bg-gray-100 dark:bg-gray-900">
+    <div class="h-[calc(100%-2rem)] bg-gray-100 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between p-2 text-sm font-semibold">
             <span>SCHEMAS</span>
             <span
                 class="text-md ml-2 mr-2"
                 [ngClass]="'icon-[fa--refresh]'"
+                (click)="refresh()"
             ></span>
         </div>
+        <div class="p-2">
+            <span
+                class="text-md mr-2"
+                [ngClass]="'icon-[fa--search]'"
+            ></span>
+            <input
+                class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
+                type="text"
+                placeholder="Filter objects"
+            />
+            <ng-template #loading>
+                <div>Loading...</div>
+            </ng-template>
+        </div>
 
-        <div>
-            <div class="p-2">
-                <span
-                    class="text-md mr-2"
-                    [ngClass]="'icon-[fa--search]'"
-                ></span>
-                <input
-                    class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
-                    type="text"
-                    placeholder="Filter objects"
-                />
-                <ng-template #loading>
-                    <div>Loading...</div>
-                </ng-template>
-            </div>
+        <div class="h-[80vh] overflow-auto">
             <div
-                class="max-h-96 max-w-full overflow-x-auto overflow-y-auto pl-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-500"
+                class="pb-2 pl-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-500"
                 *ngIf="databases['databases']; else loading"
             >
                 <div *ngIf="databases['databases']; else loading">
@@ -35,10 +36,10 @@
                     >
                         <div
                             class="flex cursor-pointer items-center"
-                            (click)="toggleSection(database.name)"
+                            (click)="toggleSection(database?.name)"
                         >
                             <span class="mr-1">
-                                <ng-container *ngIf="isOpen(database.name); else closed">
+                                <ng-container *ngIf="isOpen(database?.name); else closed">
                                     <span
                                         class="text-md mr-2"
                                         [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -51,19 +52,19 @@
                                     ></span>
                                 </ng-template>
                             </span>
-                            <span>{{ database.name }}</span>
+                            <span>{{ database?.name }}</span>
                         </div>
 
                         <div
-                            *ngIf="isOpen(database.name)"
+                            *ngIf="isOpen(database?.name)"
                             class="ml-4"
                         >
                             <div
                                 class="flex cursor-pointer items-center"
-                                (click)="toggleSection('tables')"
+                                (click)="toggleSection(database?.name + '_tables')"
                             >
                                 <span class="mr-1">
-                                    <ng-container *ngIf="isOpen('tables'); else closedTable">
+                                    <ng-container *ngIf="isOpen(database?.name + '_tables'); else closedTable">
                                         <span
                                             class="text-md mr-2"
                                             [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -79,19 +80,24 @@
                                 <span>Tables</span>
                             </div>
                             <ul
-                                *ngIf="isOpen('tables')"
+                                *ngIf="isOpen(database?.name + '_tables')"
                                 class="ml-4 list-none"
                             >
                                 <li
-                                    *ngFor="let table of database.tables"
+                                    *ngFor="let table of database?.tables"
                                     class="mb-1"
                                 >
                                     <div
                                         class="flex cursor-pointer items-center"
-                                        (click)="toggleSection(table.name)"
+                                        (click)="toggleSection(database?.name + '_table_' + table.name)"
                                     >
                                         <span class="mr-1">
-                                            <ng-container *ngIf="isOpen(table.name); else closedTable">
+                                            <ng-container
+                                                *ngIf="
+                                                    isOpen(database?.name + '_table_' + table.name);
+                                                    else closedTable
+                                                "
+                                            >
                                                 <span
                                                     class="text-md mr-2"
                                                     [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -109,22 +115,29 @@
                                             <span
                                                 class="text-md mr-5 opacity-50 transition-opacity duration-300 hover:opacity-100"
                                                 [ngClass]="'icon-[fluent--table-lightning-24-regular]'"
-                                                (click)="openNewTab(database.name, table.name)"
+                                                (click)="openNewTab(database?.name, table.name)"
                                             ></span>
                                         </span>
                                     </div>
 
                                     <!-- Display indexes inside each table -->
                                     <div
-                                        *ngIf="isOpen(table.name)"
+                                        *ngIf="isOpen(database?.name + '_table_' + table.name)"
                                         class="ml-4"
                                     >
                                         <div
                                             class="flex cursor-pointer items-center"
-                                            (click)="toggleSection('columns')"
+                                            (click)="
+                                                toggleSection(database?.name + '_table_' + table.name + '_columns')
+                                            "
                                         >
                                             <span class="mr-1">
-                                                <ng-container *ngIf="isOpen('columns'); else closedColumns">
+                                                <ng-container
+                                                    *ngIf="
+                                                        isOpen(database?.name + '_table_' + table.name + '_columns');
+                                                        else closedColumns
+                                                    "
+                                                >
                                                     <span
                                                         class="text-md mr-2"
                                                         [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -140,7 +153,7 @@
                                             <span>Columns</span>
                                         </div>
                                         <ul
-                                            *ngIf="isOpen('columns')"
+                                            *ngIf="isOpen(database?.name + '_table_' + table.name + '_columns')"
                                             class="ml-4 list-none"
                                         >
                                             <!-- Iterate over table.indexes -->
@@ -154,10 +167,17 @@
 
                                         <div
                                             class="flex cursor-pointer items-center"
-                                            (click)="toggleSection('indexes')"
+                                            (click)="
+                                                toggleSection(database?.name + '_table_' + table.name + '_indexes')
+                                            "
                                         >
                                             <span class="mr-1">
-                                                <ng-container *ngIf="isOpen('indexes'); else closedIndexes">
+                                                <ng-container
+                                                    *ngIf="
+                                                        isOpen(database?.name + '_table_' + table.name + '_indexes');
+                                                        else closedIndexes
+                                                    "
+                                                >
                                                     <span
                                                         class="text-md mr-2"
                                                         [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -173,7 +193,7 @@
                                             <span>Indexes</span>
                                         </div>
                                         <ul
-                                            *ngIf="isOpen('indexes')"
+                                            *ngIf="isOpen(database?.name + '_table_' + table.name + '_indexes')"
                                             class="ml-4 list-none"
                                         >
                                             <!-- Iterate over table.indexes -->
@@ -187,10 +207,19 @@
 
                                         <div
                                             class="flex cursor-pointer items-center"
-                                            (click)="toggleSection('foreign_keys')"
+                                            (click)="
+                                                toggleSection(database?.name + '_table_' + table.name + '_foreign_keys')
+                                            "
                                         >
                                             <span class="mr-1">
-                                                <ng-container *ngIf="isOpen('foreign_keys'); else closedForeignKeys">
+                                                <ng-container
+                                                    *ngIf="
+                                                        isOpen(
+                                                            database?.name + '_table_' + table.name + '_foreign_keys'
+                                                        );
+                                                        else closedForeignKeys
+                                                    "
+                                                >
                                                     <span
                                                         class="text-md mr-2"
                                                         [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -206,7 +235,7 @@
                                             <span>Foreign Keys</span>
                                         </div>
                                         <ul
-                                            *ngIf="isOpen('foreign_keys')"
+                                            *ngIf="isOpen(database?.name + '_table_' + table.name + '_foreign_keys')"
                                             class="ml-4 list-none"
                                         >
                                             <!-- Iterate over table.indexes -->
@@ -220,10 +249,17 @@
 
                                         <div
                                             class="flex cursor-pointer items-center"
-                                            (click)="toggleSection('triggers')"
+                                            (click)="
+                                                toggleSection(database?.name + '_table_' + table.name + '_triggers')
+                                            "
                                         >
                                             <span class="mr-1">
-                                                <ng-container *ngIf="isOpen('triggers'); else closedTriggers">
+                                                <ng-container
+                                                    *ngIf="
+                                                        isOpen(database?.name + '_table_' + table.name + '_triggers');
+                                                        else closedTriggers
+                                                    "
+                                                >
                                                     <span
                                                         class="text-md mr-2"
                                                         [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -239,7 +275,7 @@
                                             <span>Triggers</span>
                                         </div>
                                         <ul
-                                            *ngIf="isOpen('triggers')"
+                                            *ngIf="isOpen(database?.name + '_table_' + table.name + '_triggers')"
                                             class="ml-4 list-none"
                                         >
                                             <!-- Iterate over table.indexes -->
@@ -258,10 +294,15 @@
 
                             <div
                                 class="flex cursor-pointer items-center"
-                                (click)="toggleSection('views')"
+                                (click)="toggleSection(database?.name + '_table_' + table?.name + '_views')"
                             >
                                 <span class="mr-1">
-                                    <ng-container *ngIf="isOpen('views'); else closedView">
+                                    <ng-container
+                                        *ngIf="
+                                            isOpen(database?.name + '_table_' + table?.name + '_views');
+                                            else closedView
+                                        "
+                                    >
                                         <span
                                             class="text-md mr-2"
                                             [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -277,11 +318,11 @@
                                 <span>Views</span>
                             </div>
                             <ul
-                                *ngIf="isOpen('views')"
+                                *ngIf="isOpen(database?.name + '_table_' + table?.name + '_views')"
                                 class="ml-4 list-none"
                             >
                                 <li
-                                    *ngFor="let view of database.views"
+                                    *ngFor="let view of database?.views"
                                     class="mb-1"
                                 >
                                     {{ view.name }}
@@ -290,10 +331,15 @@
 
                             <div
                                 class="flex cursor-pointer items-center"
-                                (click)="toggleSection('procedures')"
+                                (click)="toggleSection(database?.name + '_table_' + table?.name + '_procedures')"
                             >
                                 <span class="mr-1">
-                                    <ng-container *ngIf="isOpen('procedures'); else closedProcedure">
+                                    <ng-container
+                                        *ngIf="
+                                            isOpen(database?.name + '_table_' + table?.name + '_procedures');
+                                            else closedProcedure
+                                        "
+                                    >
                                         <span
                                             class="text-md mr-2"
                                             [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -309,11 +355,11 @@
                                 <span>Stored Procedures</span>
                             </div>
                             <ul
-                                *ngIf="isOpen('procedures')"
+                                *ngIf="isOpen(database?.name + '_table_' + table?.name + '_procedures')"
                                 class="ml-4 list-none"
                             >
                                 <li
-                                    *ngFor="let procedure of database.procedures"
+                                    *ngFor="let procedure of database?.procedures"
                                     class="mb-1"
                                 >
                                     {{ procedure.name }}
@@ -322,10 +368,15 @@
 
                             <div
                                 class="flex cursor-pointer items-center"
-                                (click)="toggleSection('functions')"
+                                (click)="toggleSection(database?.name + '_table_' + table?.name + '_functions')"
                             >
                                 <span class="mr-1">
-                                    <ng-container *ngIf="isOpen('functions'); else closedFunction">
+                                    <ng-container
+                                        *ngIf="
+                                            isOpen(database?.name + '_table_' + table?.name + '_functions');
+                                            else closedFunction
+                                        "
+                                    >
                                         <span
                                             class="text-md mr-2"
                                             [ngClass]="'icon-[pepicons-pop--triangle-down-filled]'"
@@ -341,11 +392,11 @@
                                 <span>Functions</span>
                             </div>
                             <ul
-                                *ngIf="isOpen('functions')"
+                                *ngIf="isOpen(database?.name + '_table_' + table?.name + '_functions')"
                                 class="ml-4 list-none"
                             >
                                 <li
-                                    *ngFor="let function of database.functions"
+                                    *ngFor="let function of database?.functions"
                                     class="mb-1"
                                 >
                                     {{ function }}

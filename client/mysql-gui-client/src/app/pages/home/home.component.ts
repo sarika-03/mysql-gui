@@ -1,4 +1,15 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    SimpleChanges,
+    ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -7,6 +18,7 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/lib/codemirror.css';
 import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
+import { BackendService } from '@lib/services';
 
 @Component({
     selector: 'app-home',
@@ -14,15 +26,21 @@ import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
     imports: [CommonModule, RouterModule, FormsModule, ResultGridComponent],
     templateUrl: './home.component.html',
 })
-export class HomeComponent implements OnChanges, AfterViewInit {
+export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
     @ViewChild('editor', { static: false }) editor: ElementRef;
+    @ViewChild('tabContainer', { static: false }) tabContainer: ElementRef;
     tabs = [];
-    selectedTab = 0;
+    selectedTab = -1;
     tabContent: string[] = [];
     editorInstance: any;
+    needsEditorInit = false;
+    triggerQuery: string = '';
+    executeTriggered: boolean = false;
+    selectedDB: string = '';
+    currentTabId: string = '';
 
-    constructor() {}
+    constructor(private cdr: ChangeDetectorRef) {}
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['tabData'] && this.tabData?.dbName && this.tabData?.tableName) {
@@ -31,46 +49,62 @@ export class HomeComponent implements OnChanges, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
-            lineNumbers: true,
-            mode: 'sql',
-            theme: 'default',
-            lineWrapping: true,
-            matchBrackets: true,
-            showCursorWhenSelecting: true,
-            smartIndent: true,
-            extraKeys: {
-                'Ctrl-Space': 'autocomplete',
-                'Ctrl-Q': function (cm) {
-                    cm.foldCode(cm.getCursor());
-                },
-            },
-            autofocus: true,
-            cursorHeight: 0.85,
-            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-            highlightSelectionMatches: {
-                showToken: /\w/,
-                annotateScrollbar: true,
-            },
-            hintOptions: {
-                completeSingle: false,
-            },
-            matchTags: { bothTags: true },
-        });
-        this.editorInstance.on('change', () => {
-            this.tabContent[this.selectedTab] = this.editorInstance.getValue();
-        });
+        this.checkAndInitializeEditor();
+    }
 
-        if (this.tabContent[this.selectedTab]) {
+    ngAfterViewChecked() {
+        if (this.needsEditorInit && this.selectedTab >= 0 && this.editor && !this.editorInstance) {
+            this.checkAndInitializeEditor();
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
-        } else {
-            this.editorInstance.setValue('');
+            this.needsEditorInit = false;
+        }
+    }
+
+    checkAndInitializeEditor() {
+        if (!this.editorInstance && this.editor) {
+            this.initializeEditor();
+        }
+    }
+
+    initializeEditor() {
+        if (!this.editorInstance) {
+            this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
+                lineNumbers: true,
+                mode: 'sql',
+                theme: 'default',
+                lineWrapping: true,
+                matchBrackets: true,
+                showCursorWhenSelecting: true,
+                smartIndent: true,
+                extraKeys: {
+                    'Ctrl-Space': 'autocomplete',
+                    'Ctrl-Q': function (cm) {
+                        cm.foldCode(cm.getCursor());
+                    },
+                },
+                autofocus: true,
+                cursorHeight: 0.85,
+                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+                highlightSelectionMatches: {
+                    showToken: /\w/,
+                    annotateScrollbar: true,
+                },
+                hintOptions: {
+                    completeSingle: false,
+                },
+                matchTags: { bothTags: true },
+            });
+
+            this.editorInstance.on('change', () => {
+                this.tabContent[this.selectedTab] = this.editorInstance.getValue();
+            });
         }
     }
 
     addTab(dbName: string, tableName: string) {
         const id = `${dbName}.${tableName}`;
         const tabIndex = this.tabs.findIndex((tab) => tab.id === id);
+
         if (tabIndex > -1) {
             this.selectTab(tabIndex);
             return;
@@ -84,19 +118,44 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
         this.tabContent.push(`SELECT * FROM ${dbName}.${tableName};`);
         this.selectTab(this.tabs.length - 1);
-        if (this.editorInstance) {
+
+        if (!this.editorInstance) {
+            this.needsEditorInit = true;
+        } else {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
+            this.triggerQuery = this.tabContent[this.selectedTab];
+            this.selectedDB = dbName;
+            this.currentTabId = id;
         }
+
+        this.cdr.detectChanges();
+        this.scrollTabIntoView(this.tabs.length - 1);
     }
 
     selectTab(tabIndex: number) {
-        this.selectedTab = tabIndex;
         if (!this.tabContent[tabIndex]) {
             this.tabContent[tabIndex] = '';
         }
 
+        this.selectedTab = tabIndex;
+        this.selectedDB = this.tabs[tabIndex].dbName;
+        this.triggerQuery = this.tabContent[tabIndex];
+        this.currentTabId = this.tabs[tabIndex].id;
+
         if (this.editorInstance) {
             this.editorInstance.setValue(this.tabContent[tabIndex]);
+        }
+        this.executeTriggered = false;
+        this.cdr.detectChanges();
+        this.scrollTabIntoView(tabIndex);
+    }
+
+    scrollTabIntoView(tabIndex: number) {
+        if (this.tabContainer && this.tabContainer.nativeElement) {
+            const tabElement = this.tabContainer.nativeElement.children[tabIndex];
+            if (tabElement) {
+                tabElement.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            }
         }
     }
 
@@ -107,8 +166,27 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
         if (this.editorInstance && this.selectedTab >= 0) {
             this.editorInstance.setValue(this.tabContent[this.selectedTab]);
+            this.triggerQuery = this.tabContent[this.selectedTab];
+            this.selectedDB = this.tabs[this.selectedTab]?.dbName || '';
+            this.currentTabId = this.tabs[this.selectedTab]?.id || '';
         } else {
+            this.editorInstance?.toTextArea();
+            this.editorInstance = null;
+            this.needsEditorInit = true;
+        }
+    }
+
+    handleExecQueryClick() {
+        this.triggerQuery = this.tabContent[this.selectedTab];
+        this.executeTriggered = true;
+    }
+
+    onDiscQueryClick() {
+        if (this.editorInstance) {
             this.editorInstance.setValue('');
         }
+        this.tabContent[this.selectedTab] = '';
+        this.triggerQuery = '';
+        this.executeTriggered = false;
     }
 }

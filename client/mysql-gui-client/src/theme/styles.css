@@ -15,19 +15,14 @@
 /* utilities */
 @import './03-utilities/border.css';
 
-
-/* .CodeMirror {
-    @apply font-mono text-sm bg-gray-50 border border-gray-300 rounded-md;
+@layer components {
+    .btn-execute {
+      @apply relative z-10 !bg-green-500 text-white px-4 py-2 rounded hover:!bg-green-600
+    }
+    .btn-discard {
+      @apply relative z-10 !bg-gray-500 text-white px-4 py-2 rounded hover:!bg-gray-600
+    }
+    .CodeMirror {
+        @apply w-full max-h-[200px];
+    }
   }
-  
-  .CodeMirror-gutters {
-    @apply bg-gray-100 border-r border-gray-300;
-  }
-  
-  .CodeMirror-linenumber {
-    @apply text-gray-500;
-  }
-  
-  .CodeMirror-cursor {
-    @apply bg-black;
-  } */
