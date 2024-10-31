@@ -87,7 +87,6 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
                 enableLiveAutocompletion: true,
                 enableSnippets: true,
             });
-
             const langTools = ace.require('ace/ext/language_tools');
             langTools.setCompleters([langTools.snippetCompleter, langTools.textCompleter, langTools.keyWordCompleter]);
             this.editorInstance.on('change', () => {
