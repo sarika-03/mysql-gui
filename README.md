@@ -82,7 +82,44 @@ MYSQL GUI can be installed in multiple ways:
 
 ### From Docker Hub
 
-To be added soon.
+You can run MYSQL GUI using Docker for easy setup and deployment. Follow the steps below to get started:
+
+### Running with Docker Compose
+
+To run MYSQL GUI with Docker Compose, use the following `docker-compose.yml` file:
+
+```yaml
+version: "3"
+
+services:
+  mysql-gui:
+    container_name: "mysql-gui"
+    image: shashikumarkasturi/mysql-gui
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - MYSQL_URL=mysql://root:root@host.docker.internal:3306
+```
+
+### Steps to Run
+
+1. Create a `docker-compose.yml` file in your project directory and paste the configuration above.
+2. Start the container using the following command:
+
+```bash
+docker-compose up -d
+```
+
+This command will start MYSQL GUI in detached mode, running in the background. 3. Once the container is running, open your browser and navigate to <http://localhost:5000> to use MYSQL GUI. 4. To stop the container, run:
+
+```bash
+docker-compose down
+```
+
+### Environment Variables
+
+- **MYSQL_URL**: Replace mysql://root:root@host.docker.internal:3306 with the URL of your MySQL database if it's hosted elsewhere or has different credentials.
 
 ## Usage
 

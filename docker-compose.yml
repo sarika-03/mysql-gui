@@ -8,4 +8,4 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MYSQL_URL=mysql://root:root@localhost:3306
+      - MYSQL_URL=mysql://root:root@host.docker.internal:3306
