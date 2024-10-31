@@ -1,5 +1,5 @@
-[![npm version](https://img.shields.io/npm/v/your-package-name.svg?color=success)](https://www.npmjs.com/package/mysql-gui)
-![GitHub stars](https://img.shields.io/github/stars/kshashikumar/mysql-gui.svg?style=social)
+[![npm version](https://img.shields.io/npm/v/mysql-gui.svg?color=success)](https://www.npmjs.com/package/mysql-gui)
+[![GitHub stars](https://img.shields.io/github/stars/kshashikumar/mysql-gui.svg?style=social)](https://github.com/kshashikumar/mysql-gui/stargazers)
 
 # MYSQL GUI
 
