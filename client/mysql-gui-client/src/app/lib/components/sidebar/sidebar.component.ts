@@ -35,7 +35,6 @@ export class SideBarComponent implements OnInit {
     refresh() {
         this.getDatabases();
     }
-
     getDatabases() {
         this.isLoading = true;
         this.dbService
