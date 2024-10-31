@@ -14,7 +14,7 @@
     "clean": "rm -rf dist && rm -rf ../../src/public",
     "compress": "npx gzipper compress ./dist ../../src/public",
     "build:prod": "ng build --prod",
-    "clean-build-compress": "npm run clean && npm run build:prod && npm run compress"
+    "clean-build-compress": "npm run clean && npm run build && npm run compress"
   },
   "dependencies": {
     "@angular/animations": "^16.0.0",

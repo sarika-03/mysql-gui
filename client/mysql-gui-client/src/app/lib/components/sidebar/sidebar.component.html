@@ -3,11 +3,12 @@
     <div class="h-[calc(100%-2rem)] bg-gray-100 dark:bg-gray-900">
         <div class="mb-1 flex items-center justify-between p-2 text-sm font-semibold">
             <span>SCHEMAS</span>
-            <span
+            <button
                 class="text-md ml-2 mr-2"
-                [ngClass]="'icon-[fa--refresh]'"
                 (click)="refresh()"
-            ></span>
+            >
+                <span [ngClass]="'icon-[fa--refresh]'"></span>
+            </button>
         </div>
         <div class="p-2">
             <span
