@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  mongo-gui:
+    container_name: "mysql-gui"
+    image: kshashikumar/mysql-gui
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - MYSQL_URL=mysql://root:root@localhost:3306
