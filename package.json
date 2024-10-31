@@ -28,5 +28,8 @@
     "minimist": "^1.2.8",
     "mysql2": "^3.11.3",
     "nodemon": "^3.1.7"
+  },
+  "bin": {  
+    "mysql-gui": "./cli.js"
   }
 }
