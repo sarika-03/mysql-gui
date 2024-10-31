@@ -1,21 +1,7 @@
-import {
-    AfterViewInit,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    Input,
-    OnChanges,
-    SimpleChanges,
-    ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { newTabData } from '@lib/utils/storage/storage.types';
-import * as CodeMirror from 'codemirror';
-import 'codemirror/mode/sql/sql';
-import 'codemirror/lib/codemirror.css';
 import { BackendService } from '@lib/services';
 import { TruncatePipe } from '@lib/providers/truncate.pipe';
 

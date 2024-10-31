@@ -14,11 +14,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { newTabData } from '@lib/utils/storage/storage.types';
-import * as CodeMirror from 'codemirror';
-import 'codemirror/mode/sql/sql';
-import 'codemirror/lib/codemirror.css';
 import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
-import { BackendService } from '@lib/services';
+import * as ace from 'ace-builds';
+import 'ace-builds/src-noconflict/mode-sql';
+import 'ace-builds/src-noconflict/theme-github';
+import 'ace-builds/src-noconflict/ext-language_tools';
 
 @Component({
     selector: 'app-home',
@@ -67,36 +67,41 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     }
 
     initializeEditor() {
-        if (!this.editorInstance) {
-            this.editorInstance = CodeMirror.fromTextArea(this.editor.nativeElement, {
-                lineNumbers: true,
-                mode: 'sql',
-                theme: 'default',
-                lineWrapping: true,
-                matchBrackets: true,
-                showCursorWhenSelecting: true,
-                smartIndent: true,
-                extraKeys: {
-                    'Ctrl-Space': 'autocomplete',
-                    'Ctrl-Q': function (cm) {
-                        cm.foldCode(cm.getCursor());
-                    },
-                },
-                autofocus: true,
-                cursorHeight: 0.85,
-                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-                highlightSelectionMatches: {
-                    showToken: /\w/,
-                    annotateScrollbar: true,
-                },
-                hintOptions: {
-                    completeSingle: false,
-                },
-                matchTags: { bothTags: true },
-            });
+        ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/');
 
+        if (!this.editorInstance) {
+            this.editorInstance = ace.edit(this.editor.nativeElement);
+
+            this.editorInstance.setOptions({
+                mode: 'ace/mode/sql',
+                theme: 'ace/theme/github',
+                fontSize: '14px',
+                showPrintMargin: false,
+                wrap: true,
+                showGutter: true,
+                highlightActiveLine: true,
+                tabSize: 4,
+                cursorStyle: 'smooth',
+                showInvisibles: false,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                enableSnippets: true,
+            });
+            const langTools = ace.require('ace/ext/language_tools');
+            langTools.setCompleters([langTools.snippetCompleter, langTools.textCompleter, langTools.keyWordCompleter]);
             this.editorInstance.on('change', () => {
                 this.tabContent[this.selectedTab] = this.editorInstance.getValue();
+            });
+
+            this.editorInstance.commands.addCommand({
+                name: 'find',
+                bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
+                exec: (editor) => editor.execCommand('find'),
+            });
+            this.editorInstance.commands.addCommand({
+                name: 'replace',
+                bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
+                exec: (editor) => editor.execCommand('replace'),
             });
         }
     }
@@ -170,7 +175,7 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
             this.selectedDB = this.tabs[this.selectedTab]?.dbName || '';
             this.currentTabId = this.tabs[this.selectedTab]?.id || '';
         } else {
-            this.editorInstance?.toTextArea();
+            this.editorInstance?.destroy();
             this.editorInstance = null;
             this.needsEditorInit = true;
         }
