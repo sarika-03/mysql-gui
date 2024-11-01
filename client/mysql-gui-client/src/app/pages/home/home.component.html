@@ -2,11 +2,11 @@
     <div class="flex h-2/5 flex-col border-b border-gray-300">
         <div
             *ngIf="tabs.length > 0"
-            class="h-[36px] overflow-x-auto border-2 border-b border-gray-200 bg-gray-400 text-center text-sm font-medium text-gray-500 [&::-webkit-scrollbar]:hidden"
+            class="h-[36px] border-2 border-b border-gray-200 bg-gray-400 text-center text-sm font-medium text-gray-500 [&::-webkit-scrollbar]:hidden"
         >
             <ul
                 #tabContainer
-                class="flex overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden"
+                class="flex whitespace-nowrap [&::-webkit-scrollbar]:hidden"
             >
                 <li
                     *ngFor="let tab of tabs; let i = index"
