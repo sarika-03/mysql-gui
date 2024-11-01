@@ -1,5 +1,5 @@
 # base image
-FROM node:lts-stretch
+FROM node:22.10.0-slim
 
 WORKDIR /app
 COPY package*.json ./
