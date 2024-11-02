@@ -26,30 +26,39 @@ export class SideBarComponent implements OnInit {
 
     databases: any = {};
     isLoading: boolean = false;
+    isRefreshing: boolean = true;  // Start rotation on initial load
 
     constructor(private dbService: BackendService, private cdr: ChangeDetectorRef) {}
 
     ngOnInit(): void {
+        console.log("Initial load triggered");
         this.getDatabases();
     }
+
     refresh() {
+        console.log("Manual refresh triggered");
+        this.isRefreshing = true;  // Start rotation on refresh click
         this.getDatabases();
     }
+
     getDatabases() {
         this.isLoading = true;
-        this.dbService
-            .getDatabases()
+
+        this.dbService.getDatabases()
             .subscribe(
                 (data) => {
+                    console.log("Data pulled from backend");
                     this.databases = data;
                     this.cdr.detectChanges();
                 },
                 (error) => {
                     console.error('Error fetching databases', error);
-                },
+                }
             )
             .add(() => {
                 this.isLoading = false;
+                this.isRefreshing = false; // Stop rotation after data is loaded
+                this.cdr.detectChanges();  // Ensure the UI updates immediately
             });
     }
 
