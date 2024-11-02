@@ -12,7 +12,7 @@
     "url": "git+https://github.com/kshashikumar/mysql-gui.git"
   },
   "author": "shashi kumar kasturi",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kshashikumar/mysql-gui/issues"
   },
