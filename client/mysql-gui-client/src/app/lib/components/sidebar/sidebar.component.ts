@@ -30,13 +30,11 @@ export class SideBarComponent implements OnInit {
 
     constructor(private dbService: BackendService, private cdr: ChangeDetectorRef) {}
 
-    ngOnInit(): void {
-        // console.log("Initial load triggered");
+    ngOnInit(): void {  
         this.getDatabases();
     }
 
     refresh() {
-        // console.log("Manual refresh triggered");
         this.isRefreshing = true;  
         this.getDatabases();
     }
@@ -47,7 +45,6 @@ export class SideBarComponent implements OnInit {
         this.dbService.getDatabases()
             .subscribe(
                 (data) => {
-                    // console.log("Data pulled from backend");
                     this.databases = data;
                     this.cdr.detectChanges();
                 },
