@@ -164,6 +164,7 @@ To disable authentication, comment out or remove these variables from `.env` and
 - **Backend Modularization**: Improved architecture for easier maintenance and scaling.
 - **Dynamic Filtering**: Filter data directly within result grids.
 - **Result Limit Options**: Control the number of records displayed.
+- **AI Integration**: Leverage AI capabilities for enhanced data analysis and insights.
 
 ## Contributions
 
