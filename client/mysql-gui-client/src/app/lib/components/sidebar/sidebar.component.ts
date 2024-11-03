@@ -26,19 +26,23 @@ export class SideBarComponent implements OnInit {
 
     databases: any = {};
     isLoading: boolean = false;
+    isRefreshing: boolean = true;  
 
     constructor(private dbService: BackendService, private cdr: ChangeDetectorRef) {}
 
-    ngOnInit(): void {
+    ngOnInit(): void {  
         this.getDatabases();
     }
+
     refresh() {
+        this.isRefreshing = true;  
         this.getDatabases();
     }
+
     getDatabases() {
         this.isLoading = true;
-        this.dbService
-            .getDatabases()
+
+        this.dbService.getDatabases()
             .subscribe(
                 (data) => {
                     this.databases = data;
@@ -46,10 +50,12 @@ export class SideBarComponent implements OnInit {
                 },
                 (error) => {
                     console.error('Error fetching databases', error);
-                },
+                }
             )
             .add(() => {
                 this.isLoading = false;
+                this.isRefreshing = false; 
+                this.cdr.detectChanges();  
             });
     }
 
