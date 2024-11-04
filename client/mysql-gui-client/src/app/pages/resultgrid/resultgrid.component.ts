@@ -71,7 +71,6 @@ export class ResultGridComponent {
             (data) => {
                 if (data) {
                     const { rows, totalRows } = data;
-                    console.log(totalRows);
                     this.tabsData.set(this.tabId, data);
                     this.setData(rows);
                     if (hasLimitOrOffset) {
