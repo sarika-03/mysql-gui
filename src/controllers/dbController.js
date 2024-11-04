@@ -124,7 +124,6 @@ const getTables = async (req, res) => {
 
     // Fetch the tables
     const tables = await DBConnector.GetDB().raw("SHOW TABLES");
-    console.log("Tables:", tables[0]);
     res.status(200).json(tables[0]);
   } catch (err) {
     console.error("Error fetching tables:", err);
