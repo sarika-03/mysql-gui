@@ -64,8 +64,6 @@ export class SideBarComponent implements OnInit {
     }
 
     openNewTab(dbName: string, tableName: string) {
-        console.log(dbName);
-        console.log(tableName);
         this.newTabEmitter.emit({ dbName: dbName, tableName: tableName });
     }
 }
