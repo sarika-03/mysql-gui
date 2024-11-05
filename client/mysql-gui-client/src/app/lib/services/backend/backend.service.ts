@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { TableInfo } from '@lib/utils/storage/storage.types';
 
 @Injectable({
     providedIn: 'root',
@@ -13,6 +14,10 @@ export class BackendService {
 
     getDatabases(): Observable<any[]> {
         return this._http.get<any[]>(`${this.BASE_URL}/databases`);
+    }
+
+    getTableInfo(dbName, table): Observable<TableInfo> {
+        return this._http.get<TableInfo>(`${this.BASE_URL}/database/${dbName}/${table}/info`);
     }
 
     executeQuery(query: string, dbName: string, page: number = 1, pageSize: number = 10): Observable<any> {
