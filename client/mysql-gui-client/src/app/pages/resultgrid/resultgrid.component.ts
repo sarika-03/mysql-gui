@@ -23,6 +23,7 @@ export class ResultGridComponent {
     rows: any[] = [];
     isLoading: boolean = false;
     copiedCell: string | null = null;
+    errorMessage: string | null = null;
     copiedPosition = { left: 0, top: 0 };
     currentPage: number = 1;
     pageSize: number = 10;
@@ -57,6 +58,7 @@ export class ResultGridComponent {
         // }
 
         this.isLoading = true;
+        this.errorMessage = null;
         this.cdr.markForCheck();
 
         const hasLimitOrOffset = /LIMIT\s+\d+/i.test(this.triggerQuery) || /OFFSET\s+\d+/i.test(this.triggerQuery);
@@ -91,8 +93,11 @@ export class ResultGridComponent {
                 this.cdr.markForCheck();
             },
             (error) => {
+                this.errorMessage = 'An error occurred while executing the query. Please check and try again.';
                 console.error('Error fetching data', error);
                 this.isLoading = false;
+                this.rows = [];
+                this.headers = [];
                 this.cdr.markForCheck();
             },
         );

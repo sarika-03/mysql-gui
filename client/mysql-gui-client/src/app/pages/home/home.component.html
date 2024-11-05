@@ -1,32 +1,36 @@
-<div class="flex h-[calc(100vh-65px)] flex-col">
+<div
+    *ngIf="tabs.length > 0; else showInitDBInfo"
+    class="flex h-[calc(100vh-65px)] flex-col"
+>
     <div class="flex h-2/5 flex-col border-b border-gray-300">
         <div
-            *ngIf="tabs.length > 0"
             class="h-[36px] border-2 border-b border-gray-200 bg-gray-400 text-center text-sm font-medium text-gray-500 [&::-webkit-scrollbar]:hidden"
         >
-            <ul
-                #tabContainer
-                class="flex whitespace-nowrap [&::-webkit-scrollbar]:hidden"
-            >
-                <li
-                    *ngFor="let tab of tabs; let i = index"
-                    class="flex items-center text-black"
-                    [ngStyle]="{ 'background-color': selectedTab === i ? 'white' : 'transparent' }"
+            <div class="overflow-x-auto">
+                <ul
+                    #tabContainer
+                    class="flex whitespace-nowrap [&::-webkit-scrollbar]:hidden"
                 >
-                    <a
-                        href="#"
-                        (click)="selectTab(i)"
-                        class="inline-block rounded-t-lg p-2 text-xs font-semibold"
+                    <li
+                        *ngFor="let tab of tabs; let i = index"
+                        class="flex items-center text-black"
+                        [ngStyle]="{ 'background-color': selectedTab === i ? 'white' : 'transparent' }"
                     >
-                        {{ tab.tableName }}
-                    </a>
-                    <span
-                        class="text-md mr-2 cursor-pointer"
-                        (click)="closeTab(i)"
-                        >&times;</span
-                    >
-                </li>
-            </ul>
+                        <a
+                            href="#"
+                            (click)="selectTab(i)"
+                            class="inline-block rounded-t-lg p-1 text-xs font-semibold"
+                        >
+                            {{ tab.tableName }}
+                        </a>
+                        <span
+                            class="mb-1 mr-2 cursor-pointer text-lg"
+                            (click)="closeTab(i)"
+                            >&times;</span
+                        >
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- <div class="bg-gray-200 p-2 text-sm dark:bg-gray-800">Tools</div> -->
@@ -40,7 +44,7 @@
                 ></textarea> -->
                 <div
                     #editor
-                    class="h-[200px] w-full resize-none rounded-md bg-white p-2"
+                    class="h-[200px] w-full resize-none bg-white p-2"
                 ></div>
                 <div class="flex items-center justify-end p-2">
                     <button
@@ -74,3 +78,46 @@
         ></app-resultgrid>
     </div>
 </div>
+
+<ng-template #showInitDBInfo>
+    <div class="flex h-full flex-col items-center justify-start bg-gray-100 p-4 dark:bg-gray-900">
+        <table class="mb-4 min-w-full overflow-hidden rounded-lg border border-gray-400 bg-white shadow-lg">
+            <thead class="bg-gray-300">
+                <tr>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-700">Database Name</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-700">Size on Disk</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-700">Tables Count</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-700">Views Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let db of paginatedData"
+                    class="border-b border-gray-100 transition duration-200 hover:bg-gray-50"
+                >
+                    <td class="px-4 py-3 text-gray-800">{{ db.name }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ convertToReadableSize(db.sizeOnDisk) }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ db.tables.length }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ db.views.length }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="flex items-center space-x-2">
+            <button
+                (click)="changePage(currentPage - 1)"
+                [disabled]="currentPage === 1"
+                class="rounded-full bg-gray-500 px-3 py-1 text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+                Previous
+            </button>
+            <span *ngIf="totalRows > 0 && pageSize > 0"> Page {{ currentPage }} of {{ getTotalPages() }} </span>
+            <button
+                (click)="changePage(currentPage + 1)"
+                [disabled]="currentPage === getTotalPages()"
+                class="rounded-full bg-gray-500 px-3 py-1 text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+                Next
+            </button>
+        </div>
+    </div>
+</ng-template>

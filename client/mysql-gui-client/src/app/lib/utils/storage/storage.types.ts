@@ -19,3 +19,12 @@ export interface newTabData {
     dbName: string;
     tableName: string;
 }
+
+export interface TableInfo {
+    db_name: string;
+    table_name: string;
+    columns: any[];
+    indexes: any[];
+    foreign_keys: any[];
+    triggers: any[];
+}
