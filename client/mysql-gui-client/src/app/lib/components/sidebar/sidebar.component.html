@@ -7,7 +7,28 @@
                 class="text-md ml-2 mr-2"
                 (click)="refresh()"
             >
-                <span [ngClass]="'icon-[fa--refresh]'"></span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="2em"
+                    height="2em"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        fill="currentColor"
+                        d="M4 20v-2h2.75l-.4-.35q-1.225-1.225-1.787-2.662T4 12.05q0-2.775 1.663-4.937T10 4.25v2.1Q8.2 7 7.1 8.563T6 12.05q0 1.125.425 2.188T7.75 16.2l.25.25V14h2v6zm10-.25v-2.1q1.8-.65 2.9-2.212T18 11.95q0-1.125-.425-2.187T16.25 7.8L16 7.55V10h-2V4h6v2h-2.75l.4.35q1.225 1.225 1.788 2.663T20 11.95q0 2.775-1.662 4.938T14 19.75"
+                    >
+                        <ng-container *ngIf="isRefreshing">
+                            <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 12 12"
+                                to="360 12 12"
+                                dur="1.5s"
+                                repeatCount="indefinite"
+                            />
+                        </ng-container>
+                    </path>
+                </svg>
             </button>
         </div>
         <div class="p-2">
@@ -19,6 +40,8 @@
                 class="mb-4 h-8 rounded border focus:border-blue-300 focus:outline-none focus:ring"
                 type="text"
                 placeholder="Filter objects"
+                [(ngModel)]="filterText"
+                (input)="filterDatabases()"
             />
             <ng-template #loading>
                 <div>Loading...</div>
@@ -28,12 +51,12 @@
         <div class="h-[80vh] overflow-auto">
             <div
                 class="pb-2 pl-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-500"
-                *ngIf="databases['databases']; else loading"
+                *ngIf="filteredDatabases && filteredDatabases.length; else loading"
             >
-                <div *ngIf="databases['databases']; else loading">
+                <div *ngIf="filteredDatabases && filteredDatabases.length; else loading">
                     <div
                         class="mb-2"
-                        *ngFor="let database of databases?.databases; let i = index"
+                        *ngFor="let database of filteredDatabases; let i = index"
                     >
                         <div
                             class="flex cursor-pointer items-center"
@@ -90,7 +113,7 @@
                                 >
                                     <div
                                         class="flex cursor-pointer items-center"
-                                        (click)="toggleSection(database?.name + '_table_' + table.name)"
+                                        (click)="getTableInfo(database?.name + '_table_' + table.name)"
                                     >
                                         <span class="mr-1">
                                             <ng-container
@@ -326,11 +349,18 @@
                                     *ngFor="let view of database?.views"
                                     class="mb-1"
                                 >
-                                    {{ view.name }}
+                                    <span class="flex items-center justify-between">
+                                        {{ view.name }}
+                                        <span
+                                            class="mr-5 flex-shrink-0 text-lg opacity-50 transition-opacity duration-300 hover:opacity-100"
+                                            [ngClass]="'icon-[fluent--table-lightning-24-regular]'"
+                                            (click)="openNewTab(database?.name, view.name)"
+                                        ></span>
+                                    </span>
                                 </li>
                             </ul>
 
-                            <div
+                            <!-- <div
                                 class="flex cursor-pointer items-center"
                                 (click)="toggleSection(database?.name + '_table_' + table?.name + '_procedures')"
                             >
@@ -402,7 +432,7 @@
                                 >
                                     {{ function }}
                                 </li>
-                            </ul>
+                            </ul> -->
                         </div>
                     </div>
                 </div>

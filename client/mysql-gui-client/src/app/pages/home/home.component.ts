@@ -7,6 +7,7 @@ import {
     ElementRef,
     Input,
     OnChanges,
+    OnInit,
     SimpleChanges,
     ViewChild,
 } from '@angular/core';
@@ -26,8 +27,9 @@ import 'ace-builds/src-noconflict/ext-language_tools';
     imports: [CommonModule, RouterModule, FormsModule, ResultGridComponent],
     templateUrl: './home.component.html',
 })
-export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked {
+export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
+    @Input() InitDBInfo!: any;
     @ViewChild('editor', { static: false }) editor: ElementRef;
     @ViewChild('tabContainer', { static: false }) tabContainer: ElementRef;
     tabs = [];
@@ -40,16 +42,73 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
     selectedDB: string = '';
     currentTabId: string = '';
 
+    currentPage: number = 1;
+    pageSize: number = 5;
+    totalRows: number = 0;
+    paginatedData: any[] = [];
+
     constructor(private cdr: ChangeDetectorRef) {}
+
+    ngOnInit() {
+        if (this.InitDBInfo) {
+            this.initializeData(this.InitDBInfo);
+        }
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['tabData'] && this.tabData?.dbName && this.tabData?.tableName) {
             this.addTab(this.tabData.dbName, this.tabData.tableName);
+        } else if (changes['InitDBInfo'] && changes['InitDBInfo'].currentValue) {
+            this.initializeData(changes['InitDBInfo'].currentValue);
         }
+    }
+
+    initializeData(data: any) {
+        if (data && Array.isArray(data)) {
+            this.totalRows = data.length || 0;
+            this.updatePaginatedData();
+        } else {
+            this.totalRows = 0;
+            this.paginatedData = [];
+        }
+    }
+
+    updatePaginatedData() {
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
+        this.paginatedData = (this.InitDBInfo || []).slice(start, end);
+    }
+
+    changePage(newPage: number) {
+        if (newPage > 0 && newPage <= Math.ceil(this.totalRows / this.pageSize)) {
+            this.currentPage = newPage;
+            this.updatePaginatedData();
+        }
+    }
+    getTotalPages(): number {
+        return this.totalRows > 0 && this.pageSize > 0 ? Math.ceil(this.totalRows / this.pageSize) : 1;
     }
 
     ngAfterViewInit() {
         this.checkAndInitializeEditor();
+    }
+
+    convertToReadableSize(sizeInBytes: any): string {
+        sizeInBytes = Number(sizeInBytes);
+
+        if (isNaN(sizeInBytes)) {
+            return 'Invalid size';
+        }
+
+        const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        let unitIndex = 0;
+
+        while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
+            sizeInBytes /= 1024;
+            unitIndex++;
+        }
+
+        return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`;
     }
 
     ngAfterViewChecked() {
@@ -193,5 +252,9 @@ export class HomeComponent implements OnChanges, AfterViewInit, AfterViewChecked
         this.tabContent[this.selectedTab] = '';
         this.triggerQuery = '';
         this.executeTriggered = false;
+    }
+
+    convertToGB(sizeInBytes: number): string {
+        return (sizeInBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
     }
 }

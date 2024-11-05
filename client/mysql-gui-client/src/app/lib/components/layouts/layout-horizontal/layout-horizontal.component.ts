@@ -16,7 +16,12 @@ import * as e from 'express';
 export class LayoutHorizontalComponent {
     constructor() {}
     tabData: newTabData;
+    databases: any = {};
+
     handleNewTabData(event: newTabData) {
         this.tabData = event;
+    }
+    handleInitData(event: newTabData) {
+        this.databases = event;
     }
 }
