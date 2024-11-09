@@ -1,4 +1,5 @@
 <img src="assets/mysql-gui-logo.gif" width=75 height=75 align=left />
+
 # MySQL GUI
 
 [![npm version](https://img.shields.io/npm/v/mysql-gui.svg?color=success)](https://www.npmjs.com/package/mysql-gui)
