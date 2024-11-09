@@ -47,13 +47,17 @@ function askForPort() {
 async function main() {
   if (!argv.u) {
     const mysqlUrl = await askForMysqlUrl();
-    process.env.MYSQL_URL = mysqlUrl;
+    process.env.URL = mysqlUrl;
   } else {
-    process.env.MYSQL_URL = argv.u;
+    process.env.URL = argv.u;
   }
 
-  const port = await askForPort();
-  process.env.PORT = port;
+  if (!argv.p) {
+    const port = await askForPort();
+    process.env.PORT = port;
+  } else {
+    process.env.PORT = argv.p;
+  }
 
   const scriptPath = path.resolve(__dirname, "src/index.js");
   nodemon({ script: scriptPath });

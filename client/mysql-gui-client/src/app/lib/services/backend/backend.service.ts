@@ -13,15 +13,15 @@ export class BackendService {
     constructor(private _http: HttpClient) {}
 
     getDatabases(): Observable<any[]> {
-        return this._http.get<any[]>(`${this.BASE_URL}/databases`);
+        return this._http.get<any[]>(`${this.BASE_URL}/api/mysql/databases`);
     }
 
     getTableInfo(dbName, table): Observable<TableInfo> {
-        return this._http.get<TableInfo>(`${this.BASE_URL}/database/${dbName}/${table}/info`);
+        return this._http.get<TableInfo>(`${this.BASE_URL}/api/mysql/database/${dbName}/${table}/info`);
     }
 
     executeQuery(query: string, dbName: string, page: number = 1, pageSize: number = 10): Observable<any> {
         const payload = { query, page, pageSize };
-        return this._http.post<any[]>(`${this.BASE_URL}/database/${dbName}/execute-query`, payload);
+        return this._http.post<any[]>(`${this.BASE_URL}/api/mysql/database/${dbName}/execute-query`, payload);
     }
 }
