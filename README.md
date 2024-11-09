@@ -1,4 +1,4 @@
-<img src="assets/mysql-gui-logo.gif" width=75 height=75 align=left />
+<img src="assets/mysql-gui-logo.png" width=75 height=75 align=left />
 
 # MySQL GUI
 
