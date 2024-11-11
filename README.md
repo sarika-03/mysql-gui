@@ -1,5 +1,6 @@
+<img src="assets/mysql-gui-logo.png" width=75 height=75 align=left />
 
-# MYSQL GUI
+# MySQL GUI
 
 [![npm version](https://img.shields.io/npm/v/mysql-gui.svg?color=success)](https://www.npmjs.com/package/mysql-gui)
 [![Known Vulnerabilities](https://snyk.io/test/github/kshashikumar/mysql-gui/badge.svg)](https://snyk.io/test/github/kshashikumar/mysql-gui)
