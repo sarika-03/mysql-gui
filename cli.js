@@ -56,7 +56,6 @@ async function main() {
   }
   try {
     const npmVersion = execSync("npm --version").toString().trim();
-    console.log(npmVersion);
     const [npmMajorVersion] = npmVersion.split(".").map(Number);
     if (npmMajorVersion < MIN_NPM_VERSION) {
       console.error(`npm version ${MIN_NPM_VERSION} or higher is required.`);
