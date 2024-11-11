@@ -2,7 +2,12 @@
 const path = require("path");
 const nodemon = require("nodemon");
 const readline = require("readline");
+const { execSync } = require("child_process");
 const argv = require("minimist")(process.argv.slice(2));
+
+const MIN_NODE_VERSION = 16;
+const MIN_NPM_VERSION = 8;
+const [majorVersion] = process.versions.node.split(".").map(Number);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -45,6 +50,25 @@ function askForPort() {
 }
 
 async function main() {
+  if (majorVersion < MIN_NODE_VERSION) {
+    console.error(`Node.js version ${MIN_NODE_VERSION} or higher is required.`);
+    process.exit(1);
+  }
+  try {
+    const npmVersion = execSync("npm --version").toString().trim();
+    console.log(npmVersion);
+    const [npmMajorVersion] = npmVersion.split(".").map(Number);
+    if (npmMajorVersion < MIN_NPM_VERSION) {
+      console.error(`npm version ${MIN_NPM_VERSION} or higher is required.`);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error(
+      "Failed to check npm version. Ensure npm is installed and accessible."
+    );
+    process.exit(1);
+  }
+
   if (!argv.u) {
     const mysqlUrl = await askForMysqlUrl();
     process.env.URL = mysqlUrl;

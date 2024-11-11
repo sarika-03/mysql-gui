@@ -1,10 +1,12 @@
 {
   "name": "mysql-gui",
-  "version": "1.2.12",
+  "version": "1.2.13",
   "description": "A GUI application for mysql, which helps developers in faster development",
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.js",
+    "client": "cd client/mysql-gui-client && npm run start",
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,7 +31,13 @@
     "mysql2": "^3.11.3",
     "nodemon": "^3.1.7"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "bin": {
     "mysql-gui": "./cli.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   }
 }
