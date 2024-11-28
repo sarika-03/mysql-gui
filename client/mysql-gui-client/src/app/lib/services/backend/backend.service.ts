@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TableInfo } from '@lib/utils/storage/storage.types';
+import { DbMeta, OpenAIPrompt, OpenAIPromptResponse, TableInfo } from '@lib/utils/storage/storage.types';
 
 @Injectable({
     providedIn: 'root',
@@ -23,5 +23,11 @@ export class BackendService {
     executeQuery(query: string, dbName: string, page: number = 1, pageSize: number = 10): Observable<any> {
         const payload = { query, page, pageSize };
         return this._http.post<any[]>(`${this.BASE_URL}/database/${dbName}/execute-query`, payload);
+    }
+
+    executeOpenAIPrompt(dbMeta: DbMeta[], databaseName: string, prompt: string) {
+        console.log(dbMeta);
+        const payload: OpenAIPrompt = { dbMeta, databaseName, prompt };
+        return this._http.post<OpenAIPromptResponse>(`${this.BASE_URL}/openai/prompt`, payload);
     }
 }

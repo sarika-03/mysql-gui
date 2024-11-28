@@ -14,12 +14,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { newTabData } from '@lib/utils/storage/storage.types';
+import { DbMeta, newTabData, openAIEvent } from '@lib/utils/storage/storage.types';
 import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-noconflict/mode-sql';
 import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/ext-language_tools';
+import { BackendService } from '@lib/services';
+import { error } from 'console';
 
 @Component({
     selector: 'app-home',
@@ -29,6 +31,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 })
 export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
+    @Input() openAIEnabled!: openAIEvent;
     @Input() InitDBInfo!: any;
     @ViewChild('editor', { static: false }) editor: ElementRef;
     @ViewChild('tabContainer', { static: false }) tabContainer: ElementRef;
@@ -47,7 +50,7 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     totalRows: number = 0;
     paginatedData: any[] = [];
 
-    constructor(private cdr: ChangeDetectorRef) {}
+    constructor(private cdr: ChangeDetectorRef, private dbService: BackendService) {}
 
     ngOnInit() {
         if (this.InitDBInfo) {
@@ -243,6 +246,20 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     handleExecQueryClick() {
         this.triggerQuery = this.tabContent[this.selectedTab];
         this.executeTriggered = true;
+    }
+
+    handleOpenAIPrompt() {
+        this.triggerQuery = this.tabContent[this.selectedTab];
+        this.dbService.executeOpenAIPrompt(this.InitDBInfo, this.selectedDB, this.triggerQuery).subscribe(
+            (data) => {
+                console.log(data);
+                //this.tabContent[this.selectedTab] = data.query;
+                this.editorInstance.setValue(data.query);
+            },
+            (error) => {
+                console.log(error);
+            },
+        );
     }
 
     onDiscQueryClick() {

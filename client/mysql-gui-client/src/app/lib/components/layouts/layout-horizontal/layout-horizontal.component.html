@@ -1,5 +1,5 @@
 <div class="flex h-screen flex-col overflow-hidden">
-    <app-navbar></app-navbar>
+    <app-navbar (aiEnabledEmitter)="handleOpenAIEvent($event)"></app-navbar>
     <div class="flex flex-grow overflow-hidden rounded-md bg-gray-300 dark:bg-gray-800">
         <div class="m-1 h-full w-64 bg-gray-100 dark:bg-gray-900">
             <app-sidebar
@@ -12,6 +12,7 @@
                 <app-home
                     [tabData]="tabData"
                     [InitDBInfo]="databases"
+                    [openAIEnabled]="openAIEnabledFlag"
                 ></app-home>
             </main>
         </div>

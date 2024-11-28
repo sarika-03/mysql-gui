@@ -158,8 +158,10 @@ const executeQuery = async (req, res) => {
   let { query, page = 1, pageSize = 10 } = req.body;
 
   try {
+    // Connect to the specified database
     await DBConnector.ConnectToDb(dbName);
 
+    // Split multiple queries and filter out empty ones
     const queries = query
       .split(";")
       .map((q) => q.trim())
@@ -170,10 +172,27 @@ const executeQuery = async (req, res) => {
     let messages = [];
 
     for (const singleQuery of queries) {
+      // Check query type using regex
       const isSelectQuery = /^SELECT\s/i.test(singleQuery);
+      const isShowCommand = /^SHOW\s/i.test(singleQuery);
+      const isDescribeCommand = /^DESCRIBE\s/i.test(singleQuery);
+      const isInsertCommand = /^INSERT\s/i.test(singleQuery);
+      const isUpdateCommand = /^UPDATE\s/i.test(singleQuery);
+      const isDeleteCommand = /^DELETE\s/i.test(singleQuery);
+      const isCreateCommand = /^CREATE\s/i.test(singleQuery);
+      const isDropCommand = /^DROP\s/i.test(singleQuery);
+      const isAlterCommand = /^ALTER\s/i.test(singleQuery);
+      const isGrantCommand = /^GRANT\s/i.test(singleQuery);
+      const isRevokeCommand = /^REVOKE\s/i.test(singleQuery);
+      const isTransactionCommand =
+        /^BEGIN\s/i.test(singleQuery) ||
+        /^COMMIT\s/i.test(singleQuery) ||
+        /^ROLLBACK\s/i.test(singleQuery);
 
-      let paginatedQuery = singleQuery;
       if (isSelectQuery) {
+        // Handle SELECT queries with pagination
+        let paginatedQuery = singleQuery;
+
         const hasLimitOrOffset =
           /LIMIT\s+\d+/i.test(singleQuery) || /OFFSET\s+\d+/i.test(singleQuery);
 
@@ -190,18 +209,55 @@ const executeQuery = async (req, res) => {
           const totalRowsResult = await DBConnector.GetDB().raw(totalRowsQuery);
           totalRows = totalRowsResult[0][0].count;
         }
-      } else {
+      } else if (isShowCommand || isDescribeCommand) {
+        const queryInfo = await DBConnector.GetDB().raw(singleQuery);
+        result.push(...queryInfo[0]);
+
+        messages.push({
+          query: singleQuery,
+          message: "Database command executed successfully",
+        });
+      } else if (
+        isInsertCommand ||
+        isUpdateCommand ||
+        isDeleteCommand ||
+        isCreateCommand ||
+        isDropCommand ||
+        isAlterCommand
+      ) {
+        // Handle DML and DDL commands
         const response = await DBConnector.GetDB().raw(singleQuery);
         const affectedRows = response[0]?.affectedRows || 0;
 
         messages.push({
           query: singleQuery,
-          message: "Query executed successfully",
+          message: "Command executed successfully",
           affectedRows: affectedRows,
+        });
+      } else if (isGrantCommand || isRevokeCommand) {
+        // Handle GRANT and REVOKE commands
+        await DBConnector.GetDB().raw(singleQuery);
+        messages.push({
+          query: singleQuery,
+          message: "Permission command executed successfully",
+        });
+      } else if (isTransactionCommand) {
+        // Handle Transaction commands
+        await DBConnector.GetDB().raw(singleQuery);
+        messages.push({
+          query: singleQuery,
+          message: "Transaction command executed successfully",
+        });
+      } else {
+        // Handle unsupported or unknown commands
+        messages.push({
+          query: singleQuery,
+          message: "Command not recognized or unsupported",
         });
       }
     }
 
+    // Return results and messages
     res.status(200).json({ rows: result, totalRows, messages });
   } catch (err) {
     console.error("Error fetching queryInfo:", err);
@@ -211,7 +267,7 @@ const executeQuery = async (req, res) => {
         .status(400)
         .json({ error: "SQL syntax error. Please check your query." });
     } else {
-      res.status(500).json({ error: "Error fetching queryInfo" });
+      res.status(500).json({ error: "Error executing query." });
     }
   }
 };

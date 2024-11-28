@@ -21,7 +21,12 @@ class DBConnector {
     DBConnector.db = knex({
       client: "mysql2",
       connection: url,
-      pool: { min: 0, max: 10 },
+      pool: {
+        min: 2,
+        max: 10,
+        acquireTimeoutMillis: 60000,
+        idleTimeoutMillis: 30000,
+      },
     });
 
     // Test connection by running a simple query

@@ -20,6 +20,10 @@ export interface newTabData {
     tableName: string;
 }
 
+export interface openAIEvent {
+    openAIEnabled: boolean;
+}
+
 export interface TableInfo {
     db_name: string;
     table_name: string;
@@ -27,4 +31,29 @@ export interface TableInfo {
     indexes: any[];
     foreign_keys: any[];
     triggers: any[];
+}
+
+interface Column {
+    column_name: string;
+}
+
+interface Table {
+    name: string;
+    columns: Column[];
+}
+
+export interface DbMeta {
+    name: string;
+    sizeOnDisk: string;
+    tables: Table[];
+}
+
+export interface OpenAIPromptResponse {
+    query: string;
+}
+
+export interface OpenAIPrompt {
+    dbMeta: DbMeta[];
+    databaseName: string;
+    prompt: string;
 }
