@@ -1,10 +1,13 @@
+<img src="assets/mysql-gui-logo.png" width=75 height=75 align=left />
+
+# MySQL GUI
+
 [![npm version](https://img.shields.io/npm/v/mysql-gui.svg?color=success)](https://www.npmjs.com/package/mysql-gui)
 [![Known Vulnerabilities](https://snyk.io/test/github/kshashikumar/mysql-gui/badge.svg)](https://snyk.io/test/github/kshashikumar/mysql-gui)
 [![GitHub stars](https://img.shields.io/github/stars/kshashikumar/mysql-gui.svg?style=social)](https://github.com/kshashikumar/mysql-gui/stargazers)
 
-# MYSQL GUI
 
-**MYSQL GUI** is a web-based Graphical User Interface designed to streamline database management and accelerate development workflows for MySQL, with planned future support for all major relational databases. This tool enhances user interaction with databases, allowing developers to manage data more efficiently.
+**MySQL GUI** is a web-based Graphical User Interface designed to streamline database management and accelerate development workflows for MySQL, with planned future support for all major relational databases. This tool enhances user interaction with databases, allowing developers to manage data more efficiently.
 
 ## Features
 
@@ -39,10 +42,10 @@
 
 ## Prerequisites
 
-- **Node.js 8.0.0 or above**  
+- **Node.js 16.0.0 or above**  
   Install Node.js from the [official downloads page](https://nodejs.org/). Alternatively, manage versions dynamically with tools like nvm on macOS, Linux, or WSL.
 
-- **npm 5.0.0 or above**  
+- **npm 8.0.0 or above**  
   npm is bundled with Node.js. To upgrade, use:
   ```bash
   npm i -g npm

@@ -2,7 +2,12 @@
 const path = require("path");
 const nodemon = require("nodemon");
 const readline = require("readline");
+const { execSync } = require("child_process");
 const argv = require("minimist")(process.argv.slice(2));
+
+const MIN_NODE_VERSION = 16;
+const MIN_NPM_VERSION = 8;
+const [majorVersion] = process.versions.node.split(".").map(Number);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -113,16 +118,38 @@ async function main() {
     "TIP: You can leverage AI for free by obtaining a Gemini API Key online, which allows up to 15 requests per minute at no cost."
   );
 
-  if (!argv.u) {
-    const mysqlUrl = await askForMysqlUrl();
-    process.env.MYSQL_URL = mysqlUrl;
-  } else {
-    process.env.MYSQL_URL = argv.u;
+  if (majorVersion < MIN_NODE_VERSION) {
+    console.error(`Node.js version ${MIN_NODE_VERSION} or higher is required.`);
+    process.exit(1);
+  }
+  try {
+    const npmVersion = execSync("npm --version").toString().trim();
+    const [npmMajorVersion] = npmVersion.split(".").map(Number);
+    if (npmMajorVersion < MIN_NPM_VERSION) {
+      console.error(`npm version ${MIN_NPM_VERSION} or higher is required.`);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error(
+      "Failed to check npm version. Ensure npm is installed and accessible."
+    );
+    process.exit(1);
   }
 
-  const port = argv.p || (await askForPort());
-  process.env.PORT = port;
+  if (!argv.u) {
+    const mysqlUrl = await askForMysqlUrl();
+    process.env.URL = mysqlUrl;
+  } else {
+    process.env.URL = argv.u;
+  }
 
+  if (!argv.p) {
+    const port = await askForPort();
+    process.env.PORT = port;
+  } else {
+    process.env.PORT = argv.p;
+  }
+  
   if (argv.model && argv.apikey) {
     process.env.AI_MODEL = argv.model;
     process.env.AI_API_KEY = argv.apikey;
