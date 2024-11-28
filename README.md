@@ -132,8 +132,8 @@ MYSQL GUI integrates OpenAI and Google Gemini to generate intelligent SQL querie
 To enable AI-powered prompt querying, you need to set up the API keys for OpenAI or Google Gemini:
 
 1. **Obtain an API Key**
-   -- For OpenAI: Visit OpenAI's platform and generate an API key.
-   -- For Google Gemini: Follow Google's platform to obtain an API key (free tier provides 15 requests per minute).
+   - For OpenAI: Visit OpenAI's platform and generate an API key.
+   - For Google Gemini: Follow Google's platform to obtain an API key (free tier provides 15 requests per minute).
 2. **Add the API Key to Your Environment Variables**
    In the root directory of your project, create a .env file (or update it if it exists) and add the following lines:
 
@@ -151,7 +151,7 @@ AI_API_KEY=<YOUR_API_KEY>
 - Write a natural language query in the input box, and the AI will generate the corresponding SQL query.
 - The AI can join tables, generate aggregated queries, and suggest optimal SQL syntax.
 
-\*_Example Workflow:_
+**Example Workflow:**
 
 1. Write a query prompt:
    `Find the average salary of employees in each department.`
@@ -168,7 +168,7 @@ SELECT Department, AVG(Salary) AS AvgSalary FROM employeerecords GROUP BY Depart
 
 ### Environment Variables
 
-- **MYSQL_URL**: Replace mysql://root:root@host.docker.internal:3306 with the URL of your MySQL database if it's hosted elsewhere or has different credentials.
+- **MYSQL_URL**: Replace `mysql://root:root@host.docker.internal:3306` with the URL of your MySQL database if it's hosted elsewhere or has different credentials.
 
 ## Usage
 
@@ -189,7 +189,8 @@ mysql-gui -u mysql://<username>:<password>@<host>:<dbport>
 
 - **-u**: Specify the database URL to connect to a MySQL instance.
 - **-p**: Port number for MYSQL GUI to listen on
-- **-model**: Specify the AI model to be used (supporting model: gpt-4, gpt-3.5-turbo, text-davinci-003, gemini-1.5-flash, gemini-pro, gemini-lite)
+- **-model**: Specify the AI model to be used
+  `(supporting model: gpt-4, gpt-3.5-turbo, text-davinci-003, gemini-1.5-flash, gemini-pro, gemini-lite)`
 - **-apikey**: Specify the API key for the chosen AI model.
 
 ## Basic Authentication (Optional)
