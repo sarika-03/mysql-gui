@@ -226,6 +226,7 @@ MYSQL GUI is open for **contributions**! If you have ideas for features, improve
 ## Demo
 
 ![MYSQL-GUI](assets/mysql-gui-gif.gif)
+![MYSQL-GUI-AI](assets/mysql-gui-ai-gif.gif)
 
 ## License
 

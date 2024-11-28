@@ -30,7 +30,7 @@ export class BackendService {
         const payload = { tables };
         console.log(dbName);
         console.log(tables);
-        return this._http.post<MultipleTablesInfo>(`${this.BASE_URL}/database/${dbName}/info`, payload);
+        return this._http.post<MultipleTablesInfo>(`${this.BASE_URL}/api/mysql/database/${dbName}/info`, payload);
     }
 
     executeQuery(query: string, dbName: string, page: number = 1, pageSize: number = 10): Observable<any> {
@@ -41,6 +41,6 @@ export class BackendService {
     executeOpenAIPrompt(dbMeta: DbMeta[], databaseName: string, prompt: string) {
         console.log(dbMeta);
         const payload: OpenAIPrompt = { dbMeta, databaseName, prompt };
-        return this._http.post<OpenAIPromptResponse>(`${this.BASE_URL}/openai/prompt`, payload);
+        return this._http.post<OpenAIPromptResponse>(`${this.BASE_URL}/api/mysql/openai/prompt`, payload);
     }
 }

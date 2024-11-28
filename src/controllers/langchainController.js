@@ -49,12 +49,12 @@ const generateMySQLQuery = async (dbMeta, databaseName, prompt, llm) => {
       Table: ${requestedTable}
       Columns: ${tableColumns}
     
-      Please generate a valid SQL query based on the user's request.
-      The output must:
-      - Be a single SQL query
-      - Strictly follow valid SQL syntax
-      - Contain no natural language or explanation.
-      - Strictly one line output no double quotes or linebreaks, give it as text
+      Generate a valid single-line SQL query based on the user's request. Ensure:
+        - Use table aliases for joins and subqueries.
+        - Avoid duplicate column names by using unique aliases with AS.
+        - Handle joins, subqueries, conditional logic, nulls, and aggregation as needed.
+        - The query must support use as a subquery for paginated results, with uniquely named columns using AS.
+        - Strictly follow valid SQL syntax with no double quotes, natural language, or line breaks. Output must be plain text.
     
       Example:
       Database: test
@@ -92,12 +92,12 @@ const generateMySQLQuery = async (dbMeta, databaseName, prompt, llm) => {
         Database: ${databaseName}
         ${schemaString}
     
-       Please generate a valid SQL query based on the user's request.
-        The output must:
-        - Be a single SQL query
-        - Strictly follow valid SQL syntax
-        - Contain no natural language or explanation.
-        - Strictly one line output no double quotes or linebreaks, give it as text
+        Generate a valid single-line SQL query based on the user's request. Ensure:
+        - Use table aliases for joins and subqueries.
+        - Avoid duplicate column names by using unique aliases with AS.
+        - Handle joins, subqueries, conditional logic, nulls, and aggregation as needed.
+        - The query must support use as a subquery for paginated results, with uniquely named columns using AS.
+        - Strictly follow valid SQL syntax with no double quotes, natural language, or line breaks. Output must be plain text.
     
         Example:
         Database: test
