@@ -189,9 +189,9 @@ mysql-gui -u mysql://<username>:<password>@<host>:<dbport>
 
 - **-u**: Specify the database URL to connect to a MySQL instance.
 - **-p**: Port number for MYSQL GUI to listen on
-- **-model**: Specify the AI model to be used
+- **--model**: Specify the AI model to be used
   `(supporting model: gpt-4, gpt-3.5-turbo, text-davinci-003, gemini-1.5-flash, gemini-pro, gemini-lite)`
-- **-apikey**: Specify the API key for the chosen AI model.
+- **--apikey**: Specify the API key for the chosen AI model.
 
 ## Basic Authentication (Optional)
 
