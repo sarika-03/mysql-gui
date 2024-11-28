@@ -26,7 +26,6 @@ const generateMySQLQuery = async (dbMeta, databaseName, prompt, llm) => {
   let systemPrompt;
 
   if (requestedTable) {
-    console.log("requested table");
     // Handle prompts with a specific table name
     const selectedTable = selectedDatabase.tables.find(
       (table) => table.name === requestedTable
@@ -82,10 +81,6 @@ const generateMySQLQuery = async (dbMeta, databaseName, prompt, llm) => {
       );
     }
 
-    console.log("schemaString");
-    console.log(selectedDatabase.tables);
-    console.log(schemaString);
-
     systemPrompt = `
         You are an AI expert in generating MySQL queries. Here is the database schema:
     
@@ -111,8 +106,6 @@ const generateMySQLQuery = async (dbMeta, databaseName, prompt, llm) => {
         Please provide only the query as output.
         `;
   }
-
-  console.log("System Prompt:", systemPrompt);
 
   // Call the LLM with the system prompt
   const result = await llm.call([

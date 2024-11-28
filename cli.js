@@ -128,7 +128,7 @@ function askForAPIKey(provider) {
 async function main() {
   console.log(
     chalk.magenta(
-      "TIP: You can leverage AI for free by obtaining a Gemini API Key online, which allows up to 15 requests per minute at no cost."
+      "TIP: You can leverage AI for free by obtaining a Gemini API Key (gemini-1.5-flash) online, which allows up to 15 requests per minute at no cost."
     )
   );
 
