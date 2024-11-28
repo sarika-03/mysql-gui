@@ -138,6 +138,86 @@ const getTableInfo = async (req, res) => {
   }
 };
 
+const getMultipleTablesInfo = async (req, res) => {
+  const dbName = req.params.dbName;
+  const { tables } = req.body;
+  console;
+
+  if (!dbName || !tables || !Array.isArray(tables) || tables.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Database name and tables array are required." });
+  }
+
+  try {
+    const tableDetails = [];
+
+    for (const table of tables) {
+      // Fetch columns
+      const columns = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          COLUMN_NAME AS column_name
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+        `,
+        [dbName, table]
+      );
+
+      // Fetch indexes
+      const indexes = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          INDEX_NAME AS index_name
+        FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+        `,
+        [dbName, table]
+      );
+
+      // Fetch foreign keys
+      const foreignKeys = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          kcu.CONSTRAINT_NAME AS fk_name
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu
+        JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc 
+        ON kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+        WHERE kcu.TABLE_SCHEMA = ? AND kcu.TABLE_NAME = ? AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+        `,
+        [dbName, table]
+      );
+
+      // Fetch triggers
+      const triggers = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          TRIGGER_NAME AS trigger_name
+        FROM INFORMATION_SCHEMA.TRIGGERS
+        WHERE EVENT_OBJECT_SCHEMA = ? AND EVENT_OBJECT_TABLE = ?
+        `,
+        [dbName, table]
+      );
+
+      // Aggregate table information
+      tableDetails.push({
+        table_name: table,
+        columns: columns[0],
+        indexes: indexes[0],
+        foreign_keys: foreignKeys[0],
+        triggers: triggers[0],
+      });
+    }
+
+    res.status(200).json({ tables: tableDetails });
+  } catch (err) {
+    console.error("Error fetching multiple table stats:", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching table information." });
+  }
+};
+
 const getTables = async (req, res) => {
   const dbName = req.params.dbName;
   try {
@@ -158,8 +238,10 @@ const executeQuery = async (req, res) => {
   let { query, page = 1, pageSize = 10 } = req.body;
 
   try {
+    // Connect to the specified database
     await DBConnector.ConnectToDb(dbName);
 
+    // Split multiple queries and filter out empty ones
     const queries = query
       .split(";")
       .map((q) => q.trim())
@@ -170,10 +252,27 @@ const executeQuery = async (req, res) => {
     let messages = [];
 
     for (const singleQuery of queries) {
+      // Check query type using regex
       const isSelectQuery = /^SELECT\s/i.test(singleQuery);
+      const isShowCommand = /^SHOW\s/i.test(singleQuery);
+      const isDescribeCommand = /^DESCRIBE\s/i.test(singleQuery);
+      const isInsertCommand = /^INSERT\s/i.test(singleQuery);
+      const isUpdateCommand = /^UPDATE\s/i.test(singleQuery);
+      const isDeleteCommand = /^DELETE\s/i.test(singleQuery);
+      const isCreateCommand = /^CREATE\s/i.test(singleQuery);
+      const isDropCommand = /^DROP\s/i.test(singleQuery);
+      const isAlterCommand = /^ALTER\s/i.test(singleQuery);
+      const isGrantCommand = /^GRANT\s/i.test(singleQuery);
+      const isRevokeCommand = /^REVOKE\s/i.test(singleQuery);
+      const isTransactionCommand =
+        /^BEGIN\s/i.test(singleQuery) ||
+        /^COMMIT\s/i.test(singleQuery) ||
+        /^ROLLBACK\s/i.test(singleQuery);
 
-      let paginatedQuery = singleQuery;
       if (isSelectQuery) {
+        // Handle SELECT queries with pagination
+        let paginatedQuery = singleQuery;
+
         const hasLimitOrOffset =
           /LIMIT\s+\d+/i.test(singleQuery) || /OFFSET\s+\d+/i.test(singleQuery);
 
@@ -190,18 +289,55 @@ const executeQuery = async (req, res) => {
           const totalRowsResult = await DBConnector.GetDB().raw(totalRowsQuery);
           totalRows = totalRowsResult[0][0].count;
         }
-      } else {
+      } else if (isShowCommand || isDescribeCommand) {
+        const queryInfo = await DBConnector.GetDB().raw(singleQuery);
+        result.push(...queryInfo[0]);
+
+        messages.push({
+          query: singleQuery,
+          message: "Database command executed successfully",
+        });
+      } else if (
+        isInsertCommand ||
+        isUpdateCommand ||
+        isDeleteCommand ||
+        isCreateCommand ||
+        isDropCommand ||
+        isAlterCommand
+      ) {
+        // Handle DML and DDL commands
         const response = await DBConnector.GetDB().raw(singleQuery);
         const affectedRows = response[0]?.affectedRows || 0;
 
         messages.push({
           query: singleQuery,
-          message: "Query executed successfully",
+          message: "Command executed successfully",
           affectedRows: affectedRows,
+        });
+      } else if (isGrantCommand || isRevokeCommand) {
+        // Handle GRANT and REVOKE commands
+        await DBConnector.GetDB().raw(singleQuery);
+        messages.push({
+          query: singleQuery,
+          message: "Permission command executed successfully",
+        });
+      } else if (isTransactionCommand) {
+        // Handle Transaction commands
+        await DBConnector.GetDB().raw(singleQuery);
+        messages.push({
+          query: singleQuery,
+          message: "Transaction command executed successfully",
+        });
+      } else {
+        // Handle unsupported or unknown commands
+        messages.push({
+          query: singleQuery,
+          message: "Command not recognized or unsupported",
         });
       }
     }
 
+    // Return results and messages
     res.status(200).json({ rows: result, totalRows, messages });
   } catch (err) {
     console.error("Error fetching queryInfo:", err);
@@ -211,7 +347,7 @@ const executeQuery = async (req, res) => {
         .status(400)
         .json({ error: "SQL syntax error. Please check your query." });
     } else {
-      res.status(500).json({ error: "Error fetching queryInfo" });
+      res.status(500).json({ error: "Error executing query." });
     }
   }
 };
@@ -221,4 +357,5 @@ module.exports = {
   getTables,
   getTableInfo,
   executeQuery,
+  getMultipleTablesInfo,
 };

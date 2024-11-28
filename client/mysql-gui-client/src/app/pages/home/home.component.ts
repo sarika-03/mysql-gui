@@ -14,12 +14,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { newTabData } from '@lib/utils/storage/storage.types';
+import { DbMeta, MultipleTablesInfo, newTabData, openAIEvent } from '@lib/utils/storage/storage.types';
 import { ResultGridComponent } from '@pages/resultgrid/resultgrid.component';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-noconflict/mode-sql';
 import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/ext-language_tools';
+import { BackendService } from '@lib/services';
 
 @Component({
     selector: 'app-home',
@@ -29,6 +30,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 })
 export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
     @Input() tabData!: newTabData;
+    @Input() openAIEnabled!: openAIEvent;
     @Input() InitDBInfo!: any;
     @ViewChild('editor', { static: false }) editor: ElementRef;
     @ViewChild('tabContainer', { static: false }) tabContainer: ElementRef;
@@ -47,7 +49,7 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     totalRows: number = 0;
     paginatedData: any[] = [];
 
-    constructor(private cdr: ChangeDetectorRef) {}
+    constructor(private cdr: ChangeDetectorRef, private dbService: BackendService) {}
 
     ngOnInit() {
         if (this.InitDBInfo) {
@@ -60,6 +62,43 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
             this.addTab(this.tabData.dbName, this.tabData.tableName);
         } else if (changes['InitDBInfo'] && changes['InitDBInfo'].currentValue) {
             this.initializeData(changes['InitDBInfo'].currentValue);
+        }
+        if (changes['openAIEnabled'] && changes['openAIEnabled'].currentValue && this.selectedDB) {
+            this.updateDatabaseInfo();
+        }
+    }
+
+    updateDatabaseInfo() {
+        const selectedDatabase = this.InitDBInfo?.find((db: any) => db.name === this.selectedDB);
+
+        if (selectedDatabase && selectedDatabase.tables?.length) {
+            const tableNames = selectedDatabase.tables.map((table: any) => table.name);
+
+            // Call getMultipleTablesInfo for the selected database
+            this.dbService.getMultipleTablesInfo(this.selectedDB, tableNames).subscribe(
+                (tableInfoArray: MultipleTablesInfo) => {
+                    tableInfoArray.tables.forEach((tableInfo: any) => {
+                        const tableIndex = selectedDatabase.tables.findIndex(
+                            (t: any) => t.name === tableInfo.table_name,
+                        );
+                        if (tableIndex > -1) {
+                            selectedDatabase.tables[tableIndex] = {
+                                ...selectedDatabase.tables[tableIndex],
+                                columns: tableInfo.columns || [],
+                                indexes: tableInfo.indexes || [],
+                                foreign_keys: tableInfo.foreign_keys || [],
+                                triggers: tableInfo.triggers || [],
+                            };
+                        }
+                    });
+                    this.cdr.detectChanges();
+                },
+                (error) => {
+                    console.error('Error fetching table information for selected database:', error);
+                },
+            );
+        } else {
+            console.warn(`No tables found for selected database: ${this.selectedDB}`);
         }
     }
 
@@ -168,7 +207,6 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     addTab(dbName: string, tableName: string) {
         const id = `${dbName}.${tableName}`;
         const tabIndex = this.tabs.findIndex((tab) => tab.id === id);
-
         if (tabIndex > -1) {
             this.selectTab(tabIndex);
             return;
@@ -190,6 +228,28 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
             this.triggerQuery = this.tabContent[this.selectedTab];
             this.selectedDB = dbName;
             this.currentTabId = id;
+        }
+
+        // Check if OpenAI is enabled and if table columns are already populated
+        if (this.openAIEnabled) {
+            const selectedDatabase = this.InitDBInfo?.find((db: any) => db.name === dbName);
+
+            if (selectedDatabase) {
+                const allTablesPopulated = selectedDatabase.tables.every(
+                    (table: any) => table.columns && table.columns.length > 0,
+                );
+
+                if (!allTablesPopulated) {
+                    console.log(`Calling updateDatabaseInfo for ${dbName} as not all tables have columns populated.`);
+                    this.updateDatabaseInfo();
+                } else {
+                    console.log(
+                        `Skipping updateDatabaseInfo for ${dbName} as all tables already have columns populated.`,
+                    );
+                }
+            } else {
+                console.warn(`Database ${dbName} not found in InitDBInfo.`);
+            }
         }
 
         this.cdr.detectChanges();
@@ -243,6 +303,19 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     handleExecQueryClick() {
         this.triggerQuery = this.tabContent[this.selectedTab];
         this.executeTriggered = true;
+    }
+
+    handleOpenAIPrompt() {
+        this.triggerQuery = this.tabContent[this.selectedTab];
+        this.dbService.executeOpenAIPrompt(this.InitDBInfo, this.selectedDB, this.triggerQuery).subscribe(
+            (data) => {
+                //this.tabContent[this.selectedTab] = data.query;
+                this.editorInstance.setValue(data.query);
+            },
+            (error) => {
+                console.log(error);
+            },
+        );
     }
 
     onDiscQueryClick() {
