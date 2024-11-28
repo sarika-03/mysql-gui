@@ -306,8 +306,7 @@ export class HomeComponent implements OnInit, OnChanges, AfterViewInit, AfterVie
     }
 
     handleOpenAIPrompt() {
-        this.triggerQuery = this.tabContent[this.selectedTab];
-        this.dbService.executeOpenAIPrompt(this.InitDBInfo, this.selectedDB, this.triggerQuery).subscribe(
+        this.dbService.executeOpenAIPrompt(this.InitDBInfo, this.selectedDB, this.tabContent[this.selectedTab]).subscribe(
             (data) => {
                 //this.tabContent[this.selectedTab] = data.query;
                 this.editorInstance.setValue(data.query);
