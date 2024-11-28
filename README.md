@@ -34,6 +34,9 @@
 - **Clipboard Copy**  
   Quickly copy cell data with a single click.
 
+- **AI Integration**  
+  Leverage OpenAI and Google Gemini for generating intelligent SQL queries. Talk to your selected Database
+
 ## Prerequisites
 
 - **Node.js 8.0.0 or above**  
@@ -101,6 +104,8 @@ services:
       - "5000:5000"
     environment:
       - MYSQL_URL=mysql://root:root@host.docker.internal:3306
+      - AI_MODEL=<Model Name> #gpt-4, gpt-3.5-turbo, text-davinci-003, gemini-1.5-flash, gemini-pro, gemini-lite
+      - AI_API_KEY=<API Key>
 ```
 
 ### Steps to Run
@@ -117,6 +122,49 @@ This command will start MYSQL GUI in detached mode, running in the background. 3
 ```bash
 docker-compose down
 ```
+
+## AI Integration
+
+MYSQL GUI integrates OpenAI and Google Gemini to generate intelligent SQL queries with the following features:
+
+### Setting Up AI Integration
+
+To enable AI-powered prompt querying, you need to set up the API keys for OpenAI or Google Gemini:
+
+1. **Obtain an API Key**
+   -- For OpenAI: Visit OpenAI's platform and generate an API key.
+   -- For Google Gemini: Follow Google's platform to obtain an API key (free tier provides 15 requests per minute).
+2. **Add the API Key to Your Environment Variables**
+   In the root directory of your project, create a .env file (or update it if it exists) and add the following lines:
+
+```bash
+AI_MODEL=<MODEL_NAME>  # e.g., gpt-4 or gemini-1.5-flash
+AI_API_KEY=<YOUR_API_KEY>
+```
+
+3. **Restart MYSQL GUI**
+   Restart the application to activate AI integration.
+
+### Using AI Prompt Querying
+
+- Enable AI from the user interface using the AI toggle button.
+- Write a natural language query in the input box, and the AI will generate the corresponding SQL query.
+- The AI can join tables, generate aggregated queries, and suggest optimal SQL syntax.
+
+\*_Example Workflow:_
+
+1. Write a query prompt:
+   `Find the average salary of employees in each department.`
+2. The AI generates the SQL:
+
+```bash
+SELECT Department, AVG(Salary) AS AvgSalary FROM employeerecords GROUP BY Department;
+```
+
+## Security Note
+
+- Confidentiality: Never expose your .env file containing the API key.
+- **Secure Connections**: Ensure your MySQL connections and API keys are used securely, especially in production.
 
 ### Environment Variables
 
@@ -141,6 +189,8 @@ mysql-gui -u mysql://<username>:<password>@<host>:<dbport>
 
 - **-u**: Specify the database URL to connect to a MySQL instance.
 - **-p**: Port number for MYSQL GUI to listen on
+- **-model**: Specify the AI model to be used (supporting model: gpt-4, gpt-3.5-turbo, text-davinci-003, gemini-1.5-flash, gemini-pro, gemini-lite)
+- **-apikey**: Specify the API key for the chosen AI model.
 
 ## Basic Authentication (Optional)
 
@@ -161,10 +211,9 @@ To disable authentication, comment out or remove these variables from `.env` and
 ## Upcoming Features
 
 - **Multi-Relational DB Support**: PostgreSQL, MariaDB, SQLite3, Oracle, Amazon Redshift, and more.
-- **Backend Modularization**: Improved architecture for easier maintenance and scaling.
 - **Dynamic Filtering**: Filter data directly within result grids.
 - **Result Limit Options**: Control the number of records displayed.
-- **AI Integration**: Leverage AI capabilities for enhanced data analysis and insights.
+- **Enhanced AI Integration**: Leverage AI for complex query generation and analysis.
 
 ## Contributions
 

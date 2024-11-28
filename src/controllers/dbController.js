@@ -138,6 +138,86 @@ const getTableInfo = async (req, res) => {
   }
 };
 
+const getMultipleTablesInfo = async (req, res) => {
+  const dbName = req.params.dbName;
+  const { tables } = req.body;
+  console;
+
+  if (!dbName || !tables || !Array.isArray(tables) || tables.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Database name and tables array are required." });
+  }
+
+  try {
+    const tableDetails = [];
+
+    for (const table of tables) {
+      // Fetch columns
+      const columns = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          COLUMN_NAME AS column_name
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+        `,
+        [dbName, table]
+      );
+
+      // Fetch indexes
+      const indexes = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          INDEX_NAME AS index_name
+        FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+        `,
+        [dbName, table]
+      );
+
+      // Fetch foreign keys
+      const foreignKeys = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          kcu.CONSTRAINT_NAME AS fk_name
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu
+        JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc 
+        ON kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+        WHERE kcu.TABLE_SCHEMA = ? AND kcu.TABLE_NAME = ? AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+        `,
+        [dbName, table]
+      );
+
+      // Fetch triggers
+      const triggers = await DBConnector.GetDB().raw(
+        `
+        SELECT 
+          TRIGGER_NAME AS trigger_name
+        FROM INFORMATION_SCHEMA.TRIGGERS
+        WHERE EVENT_OBJECT_SCHEMA = ? AND EVENT_OBJECT_TABLE = ?
+        `,
+        [dbName, table]
+      );
+
+      // Aggregate table information
+      tableDetails.push({
+        table_name: table,
+        columns: columns[0],
+        indexes: indexes[0],
+        foreign_keys: foreignKeys[0],
+        triggers: triggers[0],
+      });
+    }
+
+    res.status(200).json({ tables: tableDetails });
+  } catch (err) {
+    console.error("Error fetching multiple table stats:", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching table information." });
+  }
+};
+
 const getTables = async (req, res) => {
   const dbName = req.params.dbName;
   try {
@@ -277,4 +357,5 @@ module.exports = {
   getTables,
   getTableInfo,
   executeQuery,
+  getMultipleTablesInfo,
 };

@@ -2,8 +2,8 @@ const { getAIModel } = require("../models/model");
 const argv = require("minimist")(process.argv.slice(2));
 
 const initializeLLM = () => {
-  const aiModel = process.env.AI_MODEL || "GPT-4";
-  const apiKey = argv.openai || process.env.AI_API_KEY || "";
+  const aiModel = argv.model || process.env.AI_MODEL || "GPT-4";
+  const apiKey = argv.apikey || process.env.AI_API_KEY || "";
   if (!apiKey) {
     throw new Error(
       "OpenAI API key is missing. Please provide a valid API key"

@@ -120,28 +120,47 @@ async function main() {
     process.env.MYSQL_URL = argv.u;
   }
 
-  const port = await askForPort();
+  const port = argv.p || (await askForPort());
   process.env.PORT = port;
 
-  const useAI = await askForAIUsage();
+  if (argv.model && argv.apikey) {
+    process.env.AI_MODEL = argv.model;
+    process.env.AI_API_KEY = argv.apikey;
 
-  if (useAI) {
-    const selectedModel = await askForAIModel();
-    process.env.AI_PROVIDER = selectedModel.provider;
-    process.env.AI_MODEL = selectedModel.model;
+    const isOpenAI = supportedModels.openai.includes(argv.model);
+    const isGemini = supportedModels.gemini.includes(argv.model);
 
-    const apiKey = await askForAPIKey(selectedModel.provider);
-    process.env.AI_API_KEY = apiKey;
-
-    console.log(
-      `\nSelected AI Model: ${selectedModel.model} (${selectedModel.provider})`
-    );
-    console.log(`API Key: ${apiKey ? "Provided" : "Not Provided"}`);
+    if (isOpenAI) {
+      process.env.AI_PROVIDER = "OpenAI";
+      console.log(`Using OpenAI model: ${argv.model}`);
+    } else if (isGemini) {
+      process.env.AI_PROVIDER = "Gemini";
+      console.log(`Using Google Gemini model: ${argv.model}`);
+    } else {
+      console.error("Invalid AI model specified. Exiting...");
+      process.exit(1);
+    }
   } else {
-    console.log("AI will not be used in this setup.");
-    process.env.AI_PROVIDER = null;
-    process.env.AI_MODEL = null;
-    process.env.AI_API_KEY = null;
+    const useAI = await askForAIUsage();
+
+    if (useAI) {
+      const selectedModel = await askForAIModel();
+      process.env.AI_PROVIDER = selectedModel.provider;
+      process.env.AI_MODEL = selectedModel.model;
+
+      const apiKey = await askForAPIKey(selectedModel.provider);
+      process.env.AI_API_KEY = apiKey;
+
+      console.log(
+        `\nSelected AI Model: ${selectedModel.model} (${selectedModel.provider})`
+      );
+      console.log(`API Key: ${apiKey ? "Provided" : "Not Provided"}`);
+    } else {
+      console.log("AI will not be used in this setup.");
+      process.env.AI_PROVIDER = null;
+      process.env.AI_MODEL = null;
+      process.env.AI_API_KEY = null;
+    }
   }
 
   const scriptPath = path.resolve(__dirname, "src/index.js");

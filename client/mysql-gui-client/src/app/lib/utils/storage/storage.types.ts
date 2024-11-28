@@ -33,6 +33,18 @@ export interface TableInfo {
     triggers: any[];
 }
 
+export interface IndTableInfo {
+    table_name: string;
+    columns: any[];
+    indexes: any[];
+    foreign_keys: any[];
+    triggers: any[];
+}
+
+export interface MultipleTablesInfo {
+    tables: IndTableInfo[];
+}
+
 interface Column {
     column_name: string;
 }

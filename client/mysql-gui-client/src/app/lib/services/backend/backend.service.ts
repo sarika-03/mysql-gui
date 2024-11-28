@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DbMeta, OpenAIPrompt, OpenAIPromptResponse, TableInfo } from '@lib/utils/storage/storage.types';
+import {
+    DbMeta,
+    MultipleTablesInfo,
+    OpenAIPrompt,
+    OpenAIPromptResponse,
+    TableInfo,
+} from '@lib/utils/storage/storage.types';
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +24,13 @@ export class BackendService {
 
     getTableInfo(dbName, table): Observable<TableInfo> {
         return this._http.get<TableInfo>(`${this.BASE_URL}/database/${dbName}/${table}/info`);
+    }
+
+    getMultipleTablesInfo(dbName, tables: any[]): Observable<any> {
+        const payload = { tables };
+        console.log(dbName);
+        console.log(tables);
+        return this._http.post<MultipleTablesInfo>(`${this.BASE_URL}/database/${dbName}/info`, payload);
     }
 
     executeQuery(query: string, dbName: string, page: number = 1, pageSize: number = 10): Observable<any> {
