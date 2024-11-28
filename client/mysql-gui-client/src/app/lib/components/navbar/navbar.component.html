@@ -19,6 +19,28 @@
         </nav> -->
 
         <nav class="flex items-center space-x-3">
+            <button
+                class="relative flex h-8 w-20 items-center rounded-full bg-gray-200 transition-colors duration-300 focus:outline-none dark:bg-gray-700"
+                (click)="toggleAI()"
+            >
+                <div
+                    class="absolute h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300"
+                    [ngClass]="aiEnabled ? 'bg-black-500 translate-x-12' : 'translate-x-1 bg-gray-400'"
+                ></div>
+
+                <span
+                    class="absolute text-xs font-semibold transition-all duration-300"
+                    [ngClass]="aiEnabled ? 'text-600 left-3 opacity-100' : 'left-3 text-gray-500 opacity-0'"
+                >
+                    AI ON
+                </span>
+                <span
+                    class="absolute text-xs font-semibold transition-all duration-300"
+                    [ngClass]="aiEnabled ? 'text-600 right-3 opacity-0' : 'right-3 text-gray-500 opacity-100'"
+                >
+                    AI OFF
+                </span>
+            </button>
             <a
                 href="https://github.com/kshashikumar/mysql-gui"
                 target="_blank"

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { LogoComponent } from '../logo/logo.component';
 
@@ -17,6 +17,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private readonly _router = inject(Router);
     private readonly _destroy$ = new Subject();
     currentTheme!: AppTheme | null;
+    aiEnabled: boolean = false;
+    @Output() aiEnabledEmitter = new EventEmitter<any>();
 
     private readonly _themeService = inject(ThemeService);
 
@@ -31,6 +33,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this._destroy$.complete();
         this._destroy$.unsubscribe();
+    }
+
+    toggleAI() {
+        this.aiEnabled = !this.aiEnabled;
+        this.aiEnabledEmitter.emit({ openAIEnabled: this.aiEnabled });
     }
 
     toggleTheme(): void {
