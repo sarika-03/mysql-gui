@@ -151,8 +151,8 @@ AI_API_KEY=<YOUR_API_KEY>
 ### Using AI Prompt Querying
 
 - Enable AI from the user interface using the AI toggle button.
-- Write a natural language query in the input box, and the AI will generate the corresponding SQL query.
-- The AI can join tables, generate aggregated queries, and suggest optimal SQL syntax.
+- Write a natural language query in the input box and click on AI Prompt button, AI will generate the corresponding SQL query.
+- The AI can join tables, generate aggregated queries, and suggest optimal SQL syntax based on the database you selected.
 
 **Example Workflow:**
 
