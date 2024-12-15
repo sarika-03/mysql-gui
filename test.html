@@ -1,0 +1,36 @@
+<div class="flex-shrink-0 h-2/5 flex-col border-b border-gray-300">
+    <div class="h-[36px] border-2 border-b border-gray-200 bg-gray-400 text-center text-sm font-medium text-gray-500 [&::-webkit-scrollbar]:hidden">
+        <div class="overflow-x-auto">
+            <ul #tabContainer class="flex whitespace-nowrap [&::-webkit-scrollbar]:hidden">
+                <li *ngFor="let tab of tabs; let i = index" class="flex items-center text-black"
+                    [ngStyle]="{ 'background-color': selectedTab === i ? 'white' : 'transparent' }">
+                    <a href="#" (click)="selectTab(i)" class="inline-block rounded-t-lg p-1 text-xs font-semibold">
+                        {{ tab.tableName }}
+                    </a>
+                    <span class="mb-1 mr-2 cursor-pointer text-lg" (click)="closeTab(i)">&times;</span>
+                </li>
+            </ul>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-900">
+            <div *ngIf="selectedTab !== -1">
+                <!-- Editor Section -->
+                <div #editor class="h-[200px] w-full resize-none bg-white p-2"></div>
+                <div class="flex items-center justify-between p-2 space-x-2">
+                    <!-- AI Button -->
+                    <button *ngIf="openAIEnabled && openAIEnabled.openAIEnabled"
+                        class="relative flex animate-pulse items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 px-6 py-2 text-sm font-bold text-white shadow-md hover:from-purple-600 hover:via-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                        (click)="handleOpenAIPrompt()">
+                        <span>AI Prompt</span>
+                    </button>
+                    <span *ngIf="openAIEnabled && openAIEnabled.openAIEnabled"
+                        class="relative z-20 -mx-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 text-xs font-semibold text-gray-700">OR</span>
+                    <!-- Execute Button -->
+                    <button class="btn-execute" (click)="handleExecQueryClick()">Execute Q</button>
+                    <span class="relative z-20 -mx-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 text-xs font-semibold text-gray-700">OR</span>
+                    <!-- Discard Button -->
+                    <button class="btn-discard" (click)="onDiscQueryClick()">Discard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
