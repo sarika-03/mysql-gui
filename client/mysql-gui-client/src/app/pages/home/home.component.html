@@ -2,8 +2,8 @@
     *ngIf="tabs.length > 0; else showInitDBInfo"
     class="flex h-[calc(100vh-65px)] flex-col"
 >
-    <div class="flex flex-col h-screen">
-        <div class="flex flex-grow-[1] flex-col border-b border-gray-300">
+    <div class="flex flex-col">
+        <div class="flex flex-col border-b border-gray-300">
             <div
                 class="h-[36px] border-2 border-b border-gray-200 bg-gray-400 text-center text-sm font-medium text-gray-500 [&::-webkit-scrollbar]:hidden"
             >
@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        <div class="flex flex-grow-[3] bg-gray-100 dark:bg-gray-900">
+        <div class="flex bg-gray-100 dark:bg-gray-900">
             <app-resultgrid
                 [triggerQuery]="triggerQuery"
                 [dbName]="selectedDB"
