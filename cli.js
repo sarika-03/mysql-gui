@@ -16,7 +16,8 @@ const rl = readline.createInterface({
 });
 
 // Default configurations
-const defaultMysqlUrl = "mysql://root:root@localhost:3306";
+const defaultMysqlUrl = "mysql://root:root@127.0.0.1:3306";
+
 const defaultPort = 5000;
 
 // Supported models
