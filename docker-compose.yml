@@ -7,6 +7,6 @@ services:
     restart: always
     platform: linux/amd64 
     ports:
-      - "5001:5000"
+      - "5000:5000"
     environment:
       - MYSQL_URL=mysql://root:root@host.docker.internal:3306
