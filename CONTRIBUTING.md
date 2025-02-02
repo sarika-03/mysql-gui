@@ -85,4 +85,4 @@ Please adhere to the following coding guidelines to maintain code quality and co
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Issue Tracker](https://github.com/kshashikumar/mysql-gui/issues)
 
-Thank you for contributing to [Your Project Name]! We appreciate your efforts and look forward to your input.
+Thank you for contributing to MySQL GUI! We appreciate your efforts and look forward to your input.
